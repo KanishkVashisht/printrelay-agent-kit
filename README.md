@@ -6,6 +6,8 @@ This repository contains an Agent Skill, a Python standard-library client, an ed
 
 [Service and sign-in](https://printrelay.kva1.chatgpt.site) · [API guide](https://printrelay.kva1.chatgpt.site/docs) · [OpenAPI](https://printrelay.kva1.chatgpt.site/openapi.json) · [Current capabilities](https://printrelay.kva1.chatgpt.site/api/capabilities)
 
+**Start here:** [first-run walkthrough](examples/quickstart.md). It separates a no-account local/public check from authenticated intake and tells you exactly where to stop while supplier quoting is unavailable.
+
 ## Install the skill
 
 ```sh
@@ -14,7 +16,16 @@ npx skills add KanishkVashisht/printrelay-agent-kit
 
 Review the skill and choose the agent/client you want to configure. This is the owner/repository install syntax documented by the [skills CLI](https://www.skills.sh/docs/cli). Client support and permission prompts vary. Installing the skill does not create a PrintRelay account or authorize uploading a design.
 
-You can also copy [`skills/printrelay-hardware`](skills/printrelay-hardware) into your agent's supported skill directory. Keep `SKILL.md` and `scripts/printrelay.py` together. A direct service-hosted copy is available at [SKILL.md](https://printrelay.kva1.chatgpt.site/skills/printrelay-hardware/SKILL.md).
+You can also copy the entire [`skills/printrelay-hardware`](skills/printrelay-hardware) directory into your agent's supported skill directory. Keep `SKILL.md`, `scripts/printrelay.py` and `scripts/bootstrap_key.py`; the client needs the helper for key-file authentication. A direct service-hosted copy is available at [SKILL.md](https://printrelay.kva1.chatgpt.site/skills/printrelay-hardware/SKILL.md).
+
+Skill installation does **not** install the repository's example models or tutorials. To run the examples, obtain a checkout separately:
+
+```sh
+git clone https://github.com/KanishkVashisht/printrelay-agent-kit.git
+cd printrelay-agent-kit
+```
+
+The client and committed geometry checks use Python 3's standard library; no Python packages are needed. The first-run path was checked with Python 3.14.8 on macOS. Blender is needed only to regenerate or render the parametric enclosure.
 
 ## Start with a bounded task
 

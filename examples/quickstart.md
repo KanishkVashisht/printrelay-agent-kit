@@ -1,0 +1,73 @@
+# First run: inspect, connect, then hand off
+
+Start without an account or supplier browser. You can inspect the committed CAD locally and read the public service's capabilities. Authenticated intake is a separate, optional step. A successful setup does not mean a supplier quote or order exists.
+
+## Get the files
+
+Installing the Agent Skill gives your agent its instructions and Python client. The tutorials and CAD examples live in the full repository, which you obtain separately:
+
+```sh
+git clone https://github.com/KanishkVashisht/printrelay-agent-kit.git
+cd printrelay-agent-kit
+python3 --version
+python3 skills/printrelay-hardware/scripts/printrelay.py --help
+```
+
+No Python dependency installation is needed. The first-run path was checked with Python 3.14.8 on macOS; other host combinations are not implied to be tested. Run the remaining commands from this repository root. If you already have a checkout, use it; do not overwrite local CAD revisions to follow this example.
+
+## Check the local example and public service
+
+```sh
+# Local geometry only; no account, network or Blender needed.
+python3 examples/enclosure/verify.py --check
+
+# Two public reads; no key, account, upload or private request.
+python3 skills/printrelay-hardware/scripts/printrelay.py capabilities
+python3 skills/printrelay-hardware/scripts/printrelay.py example
+```
+
+The local verifier should exit successfully with the committed base dimensions `[60,40,22]` mm and lid dimensions `[60,40,6]` mm. The public example is a separate 20 mm cube: its report should show `[20,20,20]` mm, 12 triangles, 8,000 mm³ mesh volume and `certifies_printability: false`. The report's `file_sha256` must match the SHA-256 of `examples/calibration-cube-20mm.stl`. [The enclosure walkthrough](enclosure/README.md) explains what these checks do and do not measure.
+
+Read the returned capability **statuses**, not just the HTTP success:
+
+| Capability | Meaning for the next step |
+| --- | --- |
+| `cad_intake` / `owned_cad_preflight` | Account access is still required even when the public contract says `available`. |
+| `supplier_quote_collection` / `supplier_worker_readiness` | `requires_buyer_session` or `not_verified` does not establish live supplier pricing. A quote queue entry is not an offer. |
+| `payment` / `purchase` / `print_transmission` | The beta reports these as `disabled`. Do not tell the owner a part was bought or printed. |
+
+If a command fails, stop at that stage. Do not upload CAD to troubleshoot a public-read failure. This no-account path is useful even while the supplier browser is unavailable.
+
+## Connect an account only when needed
+
+If you already have the native PrintRelay OAuth connection, use its read-only status and owned-list tools. To use an external agent or this Python client, follow the [skill's key-bootstrap procedure](../skills/printrelay-hardware/SKILL.md#connect-a-named-external-agent-without-exposing-its-secret): generate/save the secret in that runtime and register only its digest through the native connection. The owner must authorize that agent's full-account access. Alternatively, create a key through the signed-in [service console](https://printrelay.kva1.chatgpt.site/docs#keys).
+
+Once the key is registered, configure **one** source for this client:
+
+- `PRINTRELAY_API_KEY_FILE`: absolute path to the private mode0600 key file; keep `scripts/bootstrap_key.py` beside `scripts/printrelay.py`. The helper uses POSIX ownership and permissions, as on macOS/Linux.
+- `PRINTRELAY_API_KEY`: injected by your runtime's secret mechanism. Do not put the secret into a prompt, command argument, issue or repository file.
+
+Then run:
+
+```sh
+python3 skills/printrelay-hardware/scripts/printrelay.py list
+```
+
+This reads your owned requests; an empty successful result is fine. Keep the response private. A 401 or missing-key error means setup is incomplete. Do not generate multiple keys to resolve an uncertain registration: use the helper's documented `--resume` procedure.
+
+External MCP uses `https://printrelay.kva1.chatgpt.site/api/mcp` with the same account key in an Authorization Bearer header through the host's secret mechanism. Native `/mcp` uses the separate Sites OAuth connection. If neither connection nor signed-in console is available, retain the successful local/public check and stop here; no account creation or authenticated success is implied.
+
+## Choose one bounded handoff
+
+- **Smallest service exercise:** [upload the owned cube and read its preflight](README.md). This intentionally creates one private intake record, requires authorized contact/destination details, and stops before supplier comparison.
+- **Useful CAD-agent exercise:** [inspect the enclosure, upload its two components and pin two exact specifications](enclosure/README.md#optional-agent-handoff-upload--preflight--exact-spec). Review the example choices before using them. Regenerating CAD is optional; committed exports are already included.
+
+Give your agent this task after reviewing the files:
+
+> Read the PrintRelay skill and current capabilities. Use the enclosure example as a noncritical fit-check prototype. Inspect its existing geometry locally first. Tell me which account, destination or manufacturing details are still missing. After I authorize intake and supply those details, preserve the exact files and units, read preflight and pin the two specifications. Stop before sharing files with suppliers or ordering. Report blockers as blockers.
+
+Keep request IDs, CAD hashes, specification fingerprints and retry keys privately. Changed CAD or immutable intake fields need a new request. Changed manufacturing choices can receive a new specification fingerprint on the existing request, as supported by the live schema. A timeout retry reuses the same saved key and payload. To prepare a real supplier comparison later, first obtain permission to share the exact design with named providers and confirm the live supplier route works.
+
+## Report useful setup feedback
+
+For a reproducible public client problem, report your OS, Python/client version, exact command with private values replaced, exit code, error code and the last successful stage. Distinguish local geometry, public reads, authentication, intake and supplier quoting. Do not post keys, raw account-list output, customer CAD, shipping addresses or private request/quote IDs. An internal fixture test is technical validation, not a customer or manufacturing result.
