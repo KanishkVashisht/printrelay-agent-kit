@@ -7,7 +7,13 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
  def redirect_request(self, req, fp, code, msg, headers, newurl):
   raise RuntimeError('Unexpected API redirect; credential not forwarded.')
 def call(path,method='GET',body=None,content_type='application/json',idem=None,public=False):
- key=os.environ.get('PRINTRELAY_API_KEY','')
+ key=''
+ if not public:
+  key=os.environ.get('PRINTRELAY_API_KEY','');key_file=os.environ.get('PRINTRELAY_API_KEY_FILE','')
+  if key_file:
+   if key:raise ValueError('Set only one of PRINTRELAY_API_KEY_FILE or PRINTRELAY_API_KEY.')
+   from bootstrap_key import prepare
+   key=prepare(key_file,resume=True)
  if not key and not public:raise ValueError('Set PRINTRELAY_API_KEY securely in the environment.')
  headers={'User-Agent':'PrintRelay/0.3 (+https://printrelay.kva1.chatgpt.site)','Accept':'application/json'}
  if not public:headers['Authorization']='Bearer '+key

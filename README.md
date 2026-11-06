@@ -35,7 +35,7 @@ They read the service's current contract and a published measurement of the owne
 
 ## Connect your account
 
-Sign in at the service and create an account-scoped API key. Store it in the `PRINTRELAY_API_KEY` environment variable using your environment's secret mechanism. Do not paste a key into an issue, commit, prompt or example file.
+Use the native PrintRelay OAuth connection to register a key generated and saved inside the named agent’s runtime, or create a key in the signed-in service console. Native registration receives only its SHA-256 digest. The [skill](skills/printrelay-hardware/SKILL.md#connect-a-named-external-agent-without-exposing-its-secret) includes the local bootstrap and retry procedure. Store the credential through your secret mechanism, or set `PRINTRELAY_API_KEY_FILE` to its private mode0600 file. Do not paste a key into an issue, commit, prompt or example file.
 
 | Route | Authentication | Purpose |
 | --- | --- | --- |
