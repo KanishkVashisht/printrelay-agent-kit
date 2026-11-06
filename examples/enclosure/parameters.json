@@ -1,0 +1,14 @@
+{
+  "units": "mm",
+  "outer_length": 60.0,
+  "outer_width": 40.0,
+  "base_height": 22.0,
+  "wall": 2.0,
+  "floor": 2.0,
+  "lid_plate": 2.0,
+  "lid_lip_depth": 4.0,
+  "lid_lip_wall": 1.6,
+  "lid_clearance_per_side": 0.3,
+  "cable_notch_width": 10.0,
+  "cable_notch_depth_from_rim": 6.0
+}

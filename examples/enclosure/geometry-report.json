@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0",
+  "example": true,
+  "source": "local_independent_ascii_stl_measurement",
+  "units": "mm",
+  "parameters_sha256": "311ce1ddfb27a99d5ed632a04d61459e931142c08ef5bee43e3bc1c668cc8a80",
+  "source_sha256": "bf69dadd40d9b8557d4b293e7d21fb56f12fb0971f2a8de9693b69b940fba98e",
+  "verifier_sha256": "2696676312ed5ce6147f5546774a7557519715b1b743860f9dffbbd1420bd698",
+  "certifies_printability": false,
+  "limitations": [
+    "Checks bounds, edge incidence, orientation, connectedness and signed mesh volume only.",
+    "Does not check self-intersections, vertex manifoldness, wall thickness, physical clearances or fit.",
+    "Does not certify printability, strength, safety, or electronics/thermal suitability.",
+    "STL has no embedded unit contract; coordinates are explicitly interpreted as mm."
+  ],
+  "parts": {
+    "enclosure-base.stl": {
+      "file_sha256": "fa6dc0fc2d47408279b99ca3aa7cdc0677d16d69411e5e4b328943a93bcd2d0d",
+      "file_bytes": 4420,
+      "bounds_mm": {
+        "min": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "max": [
+          60.0,
+          40.0,
+          22.0
+        ]
+      },
+      "extents_mm": [
+        60.0,
+        40.0,
+        22.0
+      ],
+      "triangle_count": 44,
+      "vertex_count": 24,
+      "edge_count": 66,
+      "boundary_edge_count": 0,
+      "non_manifold_edge_count": 0,
+      "inconsistent_winding_edge_count": 0,
+      "duplicate_triangle_count": 0,
+      "degenerate_triangle_count": 0,
+      "connected_component_count": 1,
+      "signed_volume_mm3": 12360.0,
+      "analytic_volume_mm3": 12360.0
+    },
+    "enclosure-lid.stl": {
+      "file_sha256": "0ebd64955636cf15b9fa4f191d56f7fb65d6c5335542ec23341633c2745f58e2",
+      "file_bytes": 8587,
+      "bounds_mm": {
+        "min": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "max": [
+          60.0,
+          40.0,
+          6.0
+        ]
+      },
+      "extents_mm": [
+        60.0,
+        40.0,
+        6.0
+      ],
+      "triangle_count": 72,
+      "vertex_count": 38,
+      "edge_count": 108,
+      "boundary_edge_count": 0,
+      "non_manifold_edge_count": 0,
+      "inconsistent_winding_edge_count": 0,
+      "duplicate_triangle_count": 0,
+      "degenerate_triangle_count": 0,
+      "connected_component_count": 1,
+      "signed_volume_mm3": 5857.28013952,
+      "analytic_volume_mm3": 5857.28
+    }
+  }
+}

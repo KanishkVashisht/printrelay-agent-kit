@@ -1,0 +1,13 @@
+{
+  "process": "FDM",
+  "material_grade": "Unfilled PLA; brand unrestricted; no material-family substitution",
+  "finish": "As printed; no coating or additional finishing",
+  "color": "Any color explicitly accepted for this fit-check prototype",
+  "manufacturing_options": {
+    "policy": "specified",
+    "layer_height_mm": 0.2,
+    "infill_percent": 20,
+    "tolerances": "Noncritical fit check. Preserve nominal 0.3 mm clearance per side; do not scale geometry. No guaranteed dimensional tolerance is requested."
+  },
+  "required_arrival_at": null
+}

@@ -2,7 +2,7 @@
 
 **CAD preflight and exact-spec quote requests for agents.** Give a coding or CAD agent a repeatable handoff from an exported model to a tracked manufacturing request.
 
-This repository contains an Agent Skill, a Python standard-library client and an owned 20 mm test model. PrintRelay's beta can retain CAD, inspect STL geometry, pin manufacturing requirements and queue supplier quote work. A pending job is not a price. The beta does not collect payment or place orders, and geometry checks do not certify printability.
+This repository contains an Agent Skill, a Python standard-library client, an editable two-part enclosure workflow and an owned 20 mm test model. PrintRelay's beta can retain CAD, inspect STL geometry, pin manufacturing requirements and queue supplier quote work. A pending job is not a price. The beta does not collect payment or place orders, and geometry checks do not certify printability.
 
 [Service and sign-in](https://printrelay.kva1.chatgpt.site) · [API guide](https://printrelay.kva1.chatgpt.site/docs) · [OpenAPI](https://printrelay.kva1.chatgpt.site/openapi.json) · [Current capabilities](https://printrelay.kva1.chatgpt.site/api/capabilities)
 
@@ -45,7 +45,13 @@ Sign in at the service and create an account-scoped API key. Store it in the `PR
 
 Check [capabilities](https://printrelay.kva1.chatgpt.site/api/capabilities) and [docs](https://printrelay.kva1.chatgpt.site/docs) before configuring a client. Production compatibility varies by host; a reachable endpoint is not proof of a completed authenticated workflow. The client uses a named User-Agent because the service edge rejects Python urllib's default agent string.
 
-## Try the owned fixture
+## Build a real CAD handoff
+
+Start with the [parametric enclosure walkthrough](examples/enclosure/README.md): a 60 × 40 mm tray and lift-off lid, explicit clearances, a cable notch, editable Blender source, separate STL exports and measured geometry evidence. The example takes an agent from local CAD through preflight to two pinned specifications, stopping before any supplier upload or order. Its standalone verifier needs only Python's standard library; regenerating the model uses Blender.
+
+![Original enclosure model, rendered in Blender as an exploded assembly.](examples/enclosure/enclosure-preview.png)
+
+## Try the smaller owned fixture
 
 From a checkout of this repository:
 
@@ -62,7 +68,8 @@ When quotes become available, compare only offers for the same specification and
 ## Contents and scope
 
 - `skills/printrelay-hardware/`: installable instructions and client; no third-party Python dependencies.
-- `examples/`: generated calibration geometry and expected measurements, with no customer data.
-- `registry/server.draft.json`: an unpublished MCP Registry metadata draft. Its presence does not mean registry acceptance or listing.
+- `examples/enclosure/`: original parametric enclosure, exported components, reproducible checks and a CAD-agent handoff walkthrough.
+- `examples/`: calibration geometry and expected measurements, with no customer data.
+- `registry/server.json`: metadata for the [verified MCP Registry v0.3.0 listing](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.KanishkVashisht%2Fprintrelay/versions/0.3.0). See `registry/README.md` for scope and verification.
 
 The MIT license covers this repository's original code, documentation and generated fixture. It does not license the hosted service, third-party software, supplier content or user-uploaded designs. Report reproducible client issues without keys, addresses or private CAD. Follow the service's [privacy information](https://printrelay.kva1.chatgpt.site/privacy) for uploaded data.

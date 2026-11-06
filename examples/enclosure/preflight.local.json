@@ -1,0 +1,139 @@
+{
+  "schema_version": "1.0",
+  "example": true,
+  "execution": "Local analyzer invocation; no hosted upload or supplier interaction.",
+  "analyzer": {
+    "name": "PrintRelay bounded CAD preflight",
+    "source_file": "lib/cad/preflight.mjs",
+    "source_sha256": "09da4c46eaf108ed6f94af76fb32da7edcaffa271879f73ad2b0aa754ac31d3b",
+    "source_repository_commit": "10634e86d29124cb8d34157fc6f04132f67cc185"
+  },
+  "parts": {
+    "enclosure-base.stl": {
+      "file_sha256": "fa6dc0fc2d47408279b99ca3aa7cdc0677d16d69411e5e4b328943a93bcd2d0d",
+      "preflight": {
+        "schema_version": 1,
+        "format": "stl",
+        "units": "mm",
+        "unit_scale_to_mm": 1,
+        "file_bytes": 4420,
+        "certifies_printability": false,
+        "limitations": [
+          "This report does not certify printability, dimensional accuracy, strength, safety, or suitability for an application.",
+          "No self-intersection, wall-thickness, support, clearance, material, printer, or manufacturing-tolerance analysis is performed.",
+          "STL vertices are matched exactly; cracks are not welded and coordinates are never repaired or rescaled automatically.",
+          "Stored STL facet normals are checked for finite values but vertex winding determines orientation and volume."
+        ],
+        "warnings": [],
+        "topology": {
+          "checked": true,
+          "method": "exact_coordinate_edge_incidence",
+          "vertex_count": 24,
+          "edge_count": 66,
+          "boundary_edge_count": 0,
+          "non_manifold_edge_count": 0,
+          "inconsistent_winding_edge_count": 0,
+          "duplicate_triangle_count": 0,
+          "connected_component_count": 1,
+          "watertight_edge_check": true,
+          "edge_manifold": true,
+          "orientation_consistent": true,
+          "vertex_manifold_checked": false,
+          "self_intersections_checked": false
+        },
+        "volume": {
+          "checked": true,
+          "signed_mm3": 12360.000000000002,
+          "enclosed_estimate_mm3": 12360.000000000002,
+          "interpretation": "positive_winding_estimate",
+          "is_printability_proof": false
+        },
+        "status": "mesh_checked",
+        "bounds_checked": true,
+        "encoding": "ascii",
+        "bounds_mm": {
+          "min": [
+            0,
+            0,
+            0
+          ],
+          "max": [
+            60,
+            40,
+            22
+          ]
+        },
+        "extents_mm": [
+          60,
+          40,
+          22
+        ],
+        "triangle_count": 44,
+        "degenerate_triangle_count": 0
+      }
+    },
+    "enclosure-lid.stl": {
+      "file_sha256": "0ebd64955636cf15b9fa4f191d56f7fb65d6c5335542ec23341633c2745f58e2",
+      "preflight": {
+        "schema_version": 1,
+        "format": "stl",
+        "units": "mm",
+        "unit_scale_to_mm": 1,
+        "file_bytes": 8587,
+        "certifies_printability": false,
+        "limitations": [
+          "This report does not certify printability, dimensional accuracy, strength, safety, or suitability for an application.",
+          "No self-intersection, wall-thickness, support, clearance, material, printer, or manufacturing-tolerance analysis is performed.",
+          "STL vertices are matched exactly; cracks are not welded and coordinates are never repaired or rescaled automatically.",
+          "Stored STL facet normals are checked for finite values but vertex winding determines orientation and volume."
+        ],
+        "warnings": [],
+        "topology": {
+          "checked": true,
+          "method": "exact_coordinate_edge_incidence",
+          "vertex_count": 38,
+          "edge_count": 108,
+          "boundary_edge_count": 0,
+          "non_manifold_edge_count": 0,
+          "inconsistent_winding_edge_count": 0,
+          "duplicate_triangle_count": 0,
+          "connected_component_count": 1,
+          "watertight_edge_check": true,
+          "edge_manifold": true,
+          "orientation_consistent": true,
+          "vertex_manifold_checked": false,
+          "self_intersections_checked": false
+        },
+        "volume": {
+          "checked": true,
+          "signed_mm3": 5857.280139520002,
+          "enclosed_estimate_mm3": 5857.280139520002,
+          "interpretation": "positive_winding_estimate",
+          "is_printability_proof": false
+        },
+        "status": "mesh_checked",
+        "bounds_checked": true,
+        "encoding": "ascii",
+        "bounds_mm": {
+          "min": [
+            0,
+            0,
+            0
+          ],
+          "max": [
+            60,
+            40,
+            6
+          ]
+        },
+        "extents_mm": [
+          60,
+          40,
+          6
+        ],
+        "triangle_count": 72,
+        "degenerate_triangle_count": 0
+      }
+    }
+  }
+}

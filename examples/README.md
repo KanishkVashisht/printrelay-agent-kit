@@ -1,5 +1,7 @@
 # Preflight a known 20 mm model
 
+For an editable functional starting point, use the [two-part enclosure workflow](enclosure/README.md): parametric CAD, explicit clearances, separate components, local measurements and an upload-to-specification walkthrough.
+
 `calibration-cube-20mm.stl` was generated from eight vertices and twelve outward-facing triangles. It is a closed cube from `[0, 0, 0]` to `[20, 20, 20]` in explicitly declared millimeters. Its enclosed mesh volume is 8,000 mm³. This is parser/test geometry, not a certified calibration standard or a functional part.
 
 The JSON companion records its provenance and expected measurements. `calibration-cube-20mm.preflight.json` is the deterministic parser report for these bytes. No customer model or address is included.
@@ -37,4 +39,4 @@ Stop after preflight for this exercise. Do not request supplier comparison merel
 
 For a real enclosure, generate and export the part with your usual CAD tools, inspect the source model locally, then substitute that file only when its owner permits upload. Preserve the exact model revision, units and requirements. Read the live specification schema rather than copying the calibration defaults into a production job.
 
-The [CadQuery project's MCP server](https://github.com/CadQuery/cadquery-contrib/blob/master/mcp-server/README.md) supports CAD inspection and export. It is an independent project; this example does not imply endorsement or partnership. A full enclosure example is future work, not included in this fixture kit.
+The kit now includes an original [Blender enclosure example](enclosure/README.md). Use your own CAD toolchain when appropriate; the same explicit-units, exact-specification and preflight checks still apply.
