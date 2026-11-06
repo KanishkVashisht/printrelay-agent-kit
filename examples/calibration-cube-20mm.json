@@ -1,0 +1,30 @@
+{
+  "name": "20 mm calibration cube",
+  "filename": "calibration-cube-20mm.stl",
+  "units": "mm",
+  "dimensions_mm": [
+    20,
+    20,
+    20
+  ],
+  "bounds_mm": {
+    "min": [
+      0,
+      0,
+      0
+    ],
+    "max": [
+      20,
+      20,
+      20
+    ]
+  },
+  "expected_triangle_count": 12,
+  "expected_mesh_volume_mm3": 8000,
+  "geometry": "A closed cube formed by twelve outward-wound triangles. No automatic scaling.",
+  "intended_use": "Owned, noncritical test geometry for parser checks and comparable quote preparation. Not a certified calibration standard or functional component.",
+  "material_specification": null,
+  "printability_certified": false,
+  "supplier_upload_or_print_authorized": false,
+  "provenance": "Generated locally for PrintRelay on 2026-11-06 from eight explicit vertices and twelve oriented triangles; contains no customer data."
+}

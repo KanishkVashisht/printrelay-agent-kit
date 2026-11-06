@@ -1,0 +1,15 @@
+# Local credentials and generated private records
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*.json
+response*.json
+request*.json
+quote*.json
+.local/
+private/
+__pycache__/
+*.py[cod]
+.DS_Store

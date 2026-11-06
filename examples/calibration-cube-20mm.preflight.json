@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.0",
+  "example": true,
+  "source": "/examples/calibration-cube-20mm.stl",
+  "file_sha256": "c56aabb77d7665cff2d7f3636c3143bc6ae0641284696166bfa180e75a50a097",
+  "description": "Public calibration fixture measured by the same geometry preflight used for owned uploads. No supplier price, order, or printability certification is implied.",
+  "preflight": {
+    "schema_version": 1,
+    "format": "stl",
+    "units": "mm",
+    "unit_scale_to_mm": 1,
+    "file_bytes": 1511,
+    "certifies_printability": false,
+    "limitations": [
+      "This report does not certify printability, dimensional accuracy, strength, safety, or suitability for an application.",
+      "No self-intersection, wall-thickness, support, clearance, material, printer, or manufacturing-tolerance analysis is performed.",
+      "STL vertices are matched exactly; cracks are not welded and coordinates are never repaired or rescaled automatically.",
+      "Stored STL facet normals are checked for finite values but vertex winding determines orientation and volume."
+    ],
+    "warnings": [],
+    "topology": {
+      "checked": true,
+      "method": "exact_coordinate_edge_incidence",
+      "vertex_count": 8,
+      "edge_count": 18,
+      "boundary_edge_count": 0,
+      "non_manifold_edge_count": 0,
+      "inconsistent_winding_edge_count": 0,
+      "duplicate_triangle_count": 0,
+      "connected_component_count": 1,
+      "watertight_edge_check": true,
+      "edge_manifold": true,
+      "orientation_consistent": true,
+      "vertex_manifold_checked": false,
+      "self_intersections_checked": false
+    },
+    "volume": {
+      "checked": true,
+      "signed_mm3": 8000,
+      "enclosed_estimate_mm3": 8000,
+      "interpretation": "positive_winding_estimate",
+      "is_printability_proof": false
+    },
+    "status": "mesh_checked",
+    "bounds_checked": true,
+    "encoding": "ascii",
+    "bounds_mm": {
+      "min": [
+        0,
+        0,
+        0
+      ],
+      "max": [
+        20,
+        20,
+        20
+      ]
+    },
+    "extents_mm": [
+      20,
+      20,
+      20
+    ],
+    "triangle_count": 12,
+    "degenerate_triangle_count": 0
+  }
+}
