@@ -1,0 +1,93 @@
+name: MCP Registry
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: Verify the current listing or publish a new manifest version
+        required: true
+        default: verify
+        type: choice
+        options:
+          - verify
+          - publish
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: mcp-registry
+  cancel-in-progress: false
+
+jobs:
+  registry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out the public metadata
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Install a pinned official publisher
+        run: |
+          curl --fail --silent --show-error --location \
+            https://github.com/modelcontextprotocol/registry/releases/download/v1.8.8/mcp-publisher_linux_amd64.tar.gz \
+            --output "$RUNNER_TEMP/mcp-publisher.tar.gz"
+          python3 - <<'PY'
+          import hashlib, os
+          from pathlib import Path
+          archive = Path(os.environ['RUNNER_TEMP']) / 'mcp-publisher.tar.gz'
+          assert hashlib.sha256(archive.read_bytes()).hexdigest() == '09f1fa70ee146b640584274a1a6b2b8a0310b05d4321fa9224e6df6a016d67f4', 'Publisher checksum mismatch'
+          PY
+          tar -xzf "$RUNNER_TEMP/mcp-publisher.tar.gz" -C "$RUNNER_TEMP" mcp-publisher
+      - name: Validate the manifest
+        run: '"$RUNNER_TEMP/mcp-publisher" validate registry/server.json'
+      - name: Reconcile the version before publication
+        env:
+          REGISTRY_ACTION: ${{ inputs.action }}
+        run: |
+          python3 - <<'PY'
+          import json, os, urllib.error, urllib.parse, urllib.request
+          manifest = json.load(open('registry/server.json'))
+          assert manifest['name'] == 'io.github.KanishkVashisht/printrelay'
+          assert manifest['remotes'][0]['url'] == 'https://printrelay.kva1.chatgpt.site/api/mcp'
+          url = 'https://registry.modelcontextprotocol.io/v0.1/servers/' + urllib.parse.quote(manifest['name'], safe='') + '/versions/' + urllib.parse.quote(manifest['version'], safe='')
+          try:
+              with urllib.request.urlopen(url, timeout=30) as response:
+                  current = json.load(response)
+          except urllib.error.HTTPError as error:
+              if error.code != 404:
+                  raise
+              current = None
+          if os.environ['REGISTRY_ACTION'] == 'publish':
+              assert current is None, 'Version already exists. Reconcile it; publish a new version only after an intentional manifest update.'
+          else:
+              assert current is not None, 'No listing exists for this version.'
+              assert current['server'] == manifest, 'Published metadata differs from the checked-in manifest.'
+          print('Version check passed:', manifest['name'], manifest['version'])
+          PY
+      - name: Authenticate using short-lived GitHub OIDC
+        run: '"$RUNNER_TEMP/mcp-publisher" login github-oidc'
+      - name: Publish the new version
+        if: inputs.action == 'publish'
+        run: '"$RUNNER_TEMP/mcp-publisher" publish registry/server.json'
+      - name: Verify public readback
+        run: |
+          python3 - <<'PY'
+          import json, urllib.parse, urllib.request
+          manifest = json.load(open('registry/server.json'))
+          url = 'https://registry.modelcontextprotocol.io/v0.1/servers/' + urllib.parse.quote(manifest['name'], safe='') + '/versions/' + urllib.parse.quote(manifest['version'], safe='')
+          with urllib.request.urlopen(url, timeout=30) as response:
+              current = json.load(response)
+          assert current['server'] == manifest, 'Registry readback differs from the manifest.'
+          official = current['_meta']['io.modelcontextprotocol.registry/official']
+          assert official['status'] == 'active'
+          print('Verified active listing:', url)
+          PY
+      - name: Remove short-lived local registry credentials
+        if: always()
+        run: |
+          if [ -x "$RUNNER_TEMP/mcp-publisher" ]; then
+            "$RUNNER_TEMP/mcp-publisher" logout
+          fi
