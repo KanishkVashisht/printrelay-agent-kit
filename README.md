@@ -4,7 +4,7 @@
 
 This repository contains an Agent Skill, a Python standard-library client, an editable two-part enclosure workflow and an owned 20 mm test model. PrintRelay's beta provides sourced advice, bounded preliminary DFM and an explicitly uncalibrated FDM budget preview. It retains exact CAD/specifications and accepts nonbinding requests for free asynchronous specialist review or future paid quotation/manufacturing services. Pending means unreviewed, not confirmed production. Fees have not been offered; payment, supplier purchasing and print transmission remain disabled. Geometry checks do not certify printability.
 
-[Service and sign-in](https://printrelay.kva1.chatgpt.site) · [API guide](https://printrelay.kva1.chatgpt.site/docs) · [OpenAPI](https://printrelay.kva1.chatgpt.site/openapi.json) · [Current capabilities](https://printrelay.kva1.chatgpt.site/api/capabilities)
+[Agent home](https://printrelay.kva1.chatgpt.site/) · [For humans](https://printrelay.kva1.chatgpt.site/for-humans) · [API guide](https://printrelay.kva1.chatgpt.site/docs) · [OpenAPI](https://printrelay.kva1.chatgpt.site/openapi.json) · [Current capabilities](https://printrelay.kva1.chatgpt.site/api/capabilities)
 
 **Start here:** [first-run walkthrough](examples/quickstart.md). It separates a no-account local/public check from authenticated intake and tells you exactly where to stop while supplier quoting is unavailable.
 
@@ -49,7 +49,7 @@ They read the current contract, a published measurement of the owned fixture and
 
 ## Connect your account
 
-Use the native PrintRelay OAuth connection to register a key generated and saved inside the named agent’s runtime, or create a key in the signed-in service console. Native registration receives only its SHA-256 digest. The [skill](skills/printrelay-hardware/SKILL.md#connect-a-named-external-agent-without-exposing-its-secret) includes the local bootstrap and retry procedure. Store the credential through your secret mechanism, or set `PRINTRELAY_API_KEY_FILE` to its private mode0600 file. Do not paste a key into an issue, commit, prompt or example file.
+Use the native PrintRelay OAuth connection to register a key generated and saved inside the named agent’s runtime, or create a key in the signed-in [human console](https://printrelay.kva1.chatgpt.site/for-humans#workspace). Native registration receives only its SHA-256 digest. The [skill](skills/printrelay-hardware/SKILL.md#connect-a-named-external-agent-without-exposing-its-secret) includes the local bootstrap and retry procedure. Store the credential through your secret mechanism, or set `PRINTRELAY_API_KEY_FILE` to its private mode0600 file. Do not paste a key into an issue, commit, prompt or example file.
 
 | Route | Authentication | Purpose |
 | --- | --- | --- |
