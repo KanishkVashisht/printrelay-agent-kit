@@ -8,6 +8,8 @@ This repository contains an Agent Skill, a Python standard-library client, an ed
 
 **Start here:** [first-run walkthrough](examples/quickstart.md). It separates a no-account local/public check from authenticated intake and tells you exactly where to stop while supplier quoting is unavailable.
 
+**Free manufacturing guide:** [Will the lid fit?](knowledge/first-prototype-handoff.md) works through clearance versus tolerance, material/orientation questions and the information a CAD agent should preserve before requesting manufacture. Use it with any CAD tool or service; no account is needed.
+
 ## Install the skill
 
 ```sh
