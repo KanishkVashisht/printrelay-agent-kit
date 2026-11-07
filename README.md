@@ -1,8 +1,8 @@
 # PrintRelay agent kit
 
-**CAD preflight and exact-spec quote requests for agents.** Give a coding or CAD agent a repeatable handoff from an exported model to a tracked manufacturing request.
+**Free manufacturing advice and exact-CAD review requests for agents.** Give a coding or CAD agent a repeatable handoff from an exported model to a tracked manufacturing request.
 
-This repository contains an Agent Skill, a Python standard-library client, an editable two-part enclosure workflow and an owned 20 mm test model. PrintRelay's beta can retain CAD, inspect STL geometry, pin manufacturing requirements and queue supplier quote work. A pending job is not a price. The beta does not collect payment or place orders, and geometry checks do not certify printability.
+This repository contains an Agent Skill, a Python standard-library client, an editable two-part enclosure workflow and an owned 20 mm test model. PrintRelay's beta provides sourced advice, bounded preliminary DFM and an explicitly uncalibrated FDM budget preview. It retains exact CAD/specifications and accepts nonbinding requests for free asynchronous specialist review or future paid quotation/manufacturing services. Pending means unreviewed, not confirmed production. Fees have not been offered; payment, supplier purchasing and print transmission remain disabled. Geometry checks do not certify printability.
 
 [Service and sign-in](https://printrelay.kva1.chatgpt.site) · [API guide](https://printrelay.kva1.chatgpt.site/docs) · [OpenAPI](https://printrelay.kva1.chatgpt.site/openapi.json) · [Current capabilities](https://printrelay.kva1.chatgpt.site/api/capabilities)
 
@@ -42,9 +42,10 @@ From a repository checkout, these read-only client commands need no API key and 
 ```sh
 python3 skills/printrelay-hardware/scripts/printrelay.py capabilities
 python3 skills/printrelay-hardware/scripts/printrelay.py example
+python3 skills/printrelay-hardware/scripts/printrelay.py advice --topic fits
 ```
 
-They read the service's current contract and a published measurement of the owned fixture. They do not quote your model or demonstrate supplier fulfillment. If the public route is unavailable, stop and check the deployment status in the API guide before uploading anything.
+They read the current contract, a published measurement of the owned fixture and sourced manufacturing guidance. They do not quote your model or demonstrate supplier fulfillment. If the public route is unavailable, stop and check the deployment status in the API guide before uploading anything.
 
 ## Connect your account
 
@@ -52,11 +53,16 @@ Use the native PrintRelay OAuth connection to register a key generated and saved
 
 | Route | Authentication | Purpose |
 | --- | --- | --- |
-| Python client / REST | Account-scoped API key | Upload authorized CAD, read requests and preflight, retain specifications and request quote work. |
+| Public `/api/advice/mcp` | None | Two read-only tools: service status and sourced manufacturing advice. |
+| Python client / REST | Account-scoped API key | Authorized intake, exact-spec DFM/estimate previews, nonbinding review requests and quote work. |
 | `https://printrelay.kva1.chatgpt.site/api/mcp` | `Authorization: Bearer` followed by the same API key | External MCP clients that support Streamable HTTP and custom authentication headers. |
 | Native PrintRelay app / `/mcp` | Sites OAuth through the native integration | Separate native installation route; the REST API key is not its OAuth credential. |
 
 Check [capabilities](https://printrelay.kva1.chatgpt.site/api/capabilities) and [docs](https://printrelay.kva1.chatgpt.site/docs) before configuring a client. Production compatibility varies by host; a reachable endpoint is not proof of a completed authenticated workflow. The client uses a named User-Agent because the service edge rejects Python urllib's default agent string.
+
+## Request a review without ordering a print
+
+After authorized intake and a pinned specification, the [skill workflow](skills/printrelay-hardware/SKILL.md#analyze-an-exact-part-and-request-review) uses `analyze` and `estimate` with the exact specification fingerprint. `order` records a nonbinding `pending_review` request with an explicit acknowledgement and saved idempotency key. `dfm_review` is free asynchronous specialist advice; other service types express interest in future paid work whose fees require later agreement. Read `order-status` for an actual completed report, or `cancel-order` to cancel only the backlog request. A budget preview is not a supplier offer, and submitting a request authorizes no payment or printing.
 
 ## Build a real CAD handoff
 
@@ -83,6 +89,6 @@ When quotes become available, compare only offers for the same specification and
 - `skills/printrelay-hardware/`: installable instructions and client; no third-party Python dependencies.
 - `examples/enclosure/`: original parametric enclosure, exported components, reproducible checks and a CAD-agent handoff walkthrough.
 - `examples/`: calibration geometry and expected measurements, with no customer data.
-- `registry/server.json`: metadata for the [verified MCP Registry v0.3.0 listing](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.KanishkVashisht%2Fprintrelay/versions/0.3.0). See `registry/README.md` for scope and verification.
+- `registry/server.json`: prepared v0.5.0 update; the active listing remains the [verified MCP Registry v0.3.0 listing](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.KanishkVashisht%2Fprintrelay/versions/0.3.0). See `registry/README.md` for scope and verification.
 
 The MIT license covers this repository's original code, documentation and generated fixture. It does not license the hosted service, third-party software, supplier content or user-uploaded designs. Report reproducible client issues without keys, addresses or private CAD. Follow the service's [privacy information](https://printrelay.kva1.chatgpt.site/privacy) for uploaded data.

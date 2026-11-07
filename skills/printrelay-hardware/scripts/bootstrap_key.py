@@ -44,7 +44,7 @@ def main():
     parser.add_argument('--key-file', required=True, help='Private path outside source control. Never overwritten.')
     parser.add_argument('--name', required=True, help='Named target agent; use exactly the same name on retries.')
     parser.add_argument('--confirm-full-account-access', action='store_true', required=True,
-                        help='Owner authorized read/upload/compare/delete access until revoked; no key management or operator access.')
+                        help='Owner authorized read/upload/compare/delete and backlog create/cancel access until revoked; no key management, operator, payment or production access.')
     parser.add_argument('--resume', action='store_true', help='Reuse an existing mode0600 file after an interrupted registration.')
     args = parser.parse_args()
     name = args.name.strip()
