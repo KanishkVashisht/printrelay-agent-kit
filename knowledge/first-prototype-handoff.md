@@ -86,6 +86,6 @@ A production lead time is not an arrival date. A queued review is not a complete
 
 ## Try the workflow
 
-Start with the [local/public quickstart](../examples/quickstart.md), then the [enclosure walkthrough](../examples/enclosure/README.md). Free advice and this guide can help prepare the design. For optional hosted analysis, estimates or review requests, inspect [PrintRelay's live capabilities](https://printrelay.kva1.chatgpt.site/api/capabilities) and current terms; availability and commercial status are separate from this free document. Do not infer a supplier quote, payment or print from an intake record.
+Start with the [local/public quickstart](../examples/quickstart.md), then the [enclosure walkthrough](../examples/enclosure/README.md). Free advice and this guide can help prepare the design. For optional hosted analysis, estimates or review requests, inspect [PrintRelay's live capabilities](https://partsforagents.com/api/capabilities) and current terms; availability and commercial status are separate from this free document. Do not infer a supplier quote, payment or print from an intake record.
 
 Sources checked November 6, 2026. The original explanation, arithmetic and example are provided under the repository's MIT license; linked third-party sources retain their own terms. Prepared with AI assistance. No source organization endorses PrintRelay.

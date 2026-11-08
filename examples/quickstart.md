@@ -1,6 +1,6 @@
 # First run: inspect, connect, then hand off
 
-Start without an account or supplier browser. You can inspect the committed CAD locally and read the public service's capabilities. Authenticated intake is a separate, optional step. A successful setup does not mean a supplier quote or order exists.
+Start without an account: inspect the committed CAD locally and read public service readiness. Authenticated intake is a separate, optional step. Current fulfillment is owner-operated FDM; successful setup is not a firm offer, payment or manufactured part.
 
 ## Get the files
 
@@ -33,14 +33,16 @@ Read the returned capability **statuses**, not just the HTTP success:
 | Capability | Meaning for the next step |
 | --- | --- |
 | `cad_intake` / `owned_cad_preflight` | Account access is still required even when the public contract says `available`. |
-| `supplier_quote_collection` / `supplier_worker_readiness` | `requires_buyer_session` or `not_verified` does not establish live supplier pricing. A quote queue entry is not an offer. |
+| `manual_fdm_fulfillment` | `requires_setup` or `not_verified` means no ready operator offer. Even `ready_for_operator_offer` requires an exact offer for this job. |
+| `/api/production-capabilities` | Read `available_materials` for configured grades/colors; proposed red/blue/yellow is not stock. Quantity is confirmed only by an offer. |
+| `supplier_quote_collection` / `supplier_worker_readiness` | Federated supplier execution is `deferred`; `not_verified` establishes no supplier pricing. |
 | `payment` / `purchase` / `print_transmission` | The beta reports these as `disabled`. Do not tell the owner a part was bought or printed. |
 
-If a command fails, stop at that stage. Do not upload CAD to troubleshoot a public-read failure. This no-account path is useful even while the supplier browser is unavailable.
+If a command fails, stop at that stage. Do not upload CAD to troubleshoot a public-read failure. Public MCP at `https://partsforagents.com/api/advice/mcp` exposes 3 read-only tools, including `get_production_capabilities`; REST provides `GET https://partsforagents.com/api/production-capabilities` without a key. The Python CLI has no production-capabilities command.
 
 ## Connect an account only when needed
 
-If you already have the native PrintRelay OAuth connection, use its read-only status and owned-list tools. To use an external agent or this Python client, follow the [skill's key-bootstrap procedure](../skills/printrelay-hardware/SKILL.md#connect-a-named-external-agent-without-exposing-its-secret): generate/save the secret in that runtime and register only its digest through the native connection. The owner must authorize that agent's full-account access. Alternatively, create a key through the signed-in [service console](https://printrelay.kva1.chatgpt.site/docs#keys).
+If you already have the native PrintRelay OAuth connection, use its read-only status and owned-list tools. To use an external agent or this Python client, follow the [skill's key-bootstrap procedure](../skills/printrelay-hardware/SKILL.md#connect-a-named-external-agent-without-exposing-its-secret): generate/save the secret in that runtime and register only its digest through the native connection. The owner must authorize that agent's full-account access, including offer acceptance only with explicit approval of each exact offer. Alternatively, create a key through the signed-in [service console](https://partsforagents.com/docs#keys).
 
 Once the key is registered, configure **one** source for this client:
 
@@ -55,7 +57,7 @@ python3 skills/printrelay-hardware/scripts/printrelay.py list
 
 This reads your owned requests; an empty successful result is fine. Keep the response private. A 401 or missing-key error means setup is incomplete. Do not generate multiple keys to resolve an uncertain registration: use the helper's documented `--resume` procedure.
 
-External MCP uses `https://printrelay.kva1.chatgpt.site/api/mcp` with the same account key in an Authorization Bearer header through the host's secret mechanism. Native `/mcp` uses the separate Sites OAuth connection. If neither connection nor signed-in console is available, retain the successful local/public check and stop here; no account creation or authenticated success is implied.
+External MCP uses `https://partsforagents.com/api/mcp` with the same account key in an Authorization Bearer header through the host's secret mechanism (20 workflow tools). Native `https://printrelay.kva1.chatgpt.site/mcp` uses the separate Sites OAuth connection (23 tools, including native-only key management). The unchanged Python client still calls the original Sites host; do not invent new CLI commands for the 0.6 offer/tracking tools. If neither connection nor signed-in console is available, retain the successful local/public check and stop here; no account creation or authenticated success is implied.
 
 ## Choose one bounded handoff
 
@@ -66,8 +68,8 @@ Give your agent this task after reviewing the files:
 
 > Read the PrintRelay skill and current capabilities. Use the enclosure example as a noncritical fit-check prototype. Inspect its existing geometry locally first. Tell me which account, destination or manufacturing details are still missing. After I authorize intake and supply those details, preserve the exact files and units, read preflight and pin the two specifications. Stop before sharing files with suppliers or ordering. Report blockers as blockers.
 
-Keep request IDs, CAD hashes, specification fingerprints and retry keys privately. Changed CAD or immutable intake fields need a new request. Changed manufacturing choices can receive a new specification fingerprint on the existing request, as supported by the live schema. A timeout retry reuses the same saved key and payload. To prepare a real supplier comparison later, first obtain permission to share the exact design with named providers and confirm the live supplier route works.
+Keep request IDs, CAD hashes, specification fingerprints and retry keys privately. Changed CAD or immutable intake fields need a new request. Changed manufacturing choices can receive a new specification fingerprint on the existing request, as supported by the live schema. A timeout retry reuses the same saved key and payload. For an owner-fulfilled FDM request after the exercise, read the [offer and tracking workflow](manual-fdm.md). A complete shipping specification must be pinned before a firm offer; a changed spec needs a new matching nonbinding request. Review actual stocked grade and one exact color per part. Do not submit to deferred supplier workflows merely to test setup.
 
 ## Report useful setup feedback
 
-For a reproducible public client problem, report your OS, Python/client version, exact command with private values replaced, exit code, error code and the last successful stage. Distinguish local geometry, public reads, authentication, intake and supplier quoting. Do not post keys, raw account-list output, customer CAD, shipping addresses or private request/quote IDs. An internal fixture test is technical validation, not a customer or manufacturing result.
+For a reproducible public client problem, report your OS, Python/client version, exact command with private values replaced, exit code, error code and the last successful stage. Distinguish local geometry, public reads, authentication, intake, an issued offer, acceptance and recorded fulfillment facts. Do not post keys, raw account-list output, customer CAD, shipping addresses or private request/quote IDs. An internal fixture test is technical validation, not a customer or manufacturing result.
