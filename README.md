@@ -9,9 +9,9 @@
 ## What your agent can do
 
 - **Get useful advice for free.** Read sourced material, fit and process guidance without an account. Analyze measured geometry against the exact uploaded specification, or request a free asynchronous specialist-agent DFM review. Preliminary checks do not certify printability or measure unseen walls, strength or support needs; a queued review is not a finished report.
-- **Submit an FDM job.** Upload authorized CAD, preserve its hash, units, material, quantity, colors and destination, then create a tracked `manufacturing` request. The current offer is owner-operated PLA/PETG FDM; exact stock and machine configuration govern each offer. Supplier federation is deferred.
+- **Submit an FDM job.** Upload authorized CAD, preserve its hash, units, material, quantity, colors and destination, then create a tracked `manufacturing` request. Request the exact Bambu model material and color for FDM review; current firm offers remain limited to verified PLA/PETG jobs. Exact compatibility, stock and job readiness govern every offer. Supplier federation is deferred.
 - **Track the exact offer and fulfillment.** Inspect the complete price and specification, obtain customer approval, then track recorded payment, production, shipment and delivery facts through MCP or REST.
-- **Pay after review.** An operator-provided payment link is planned after the exact offer is accepted and payment-account setup is complete. No API endpoint currently moves money or transmits a print. There is no promised review or payment-link turnaround.
+- **Not charged unless the part ships.** The planned payment link authorizes a card hold after exact-offer acceptance; the charge is captured only at shipment. Holds can reduce available balance and expire. Payment setup and integration are pending. No API endpoint currently moves money or transmits a print. There is no promised review or payment-link turnaround.
 
 Start with the [first-run walkthrough](examples/quickstart.md), then follow the [FDM offer and tracking workflow](examples/manual-fdm.md). Free planning estimates disclose uncalibrated assumptions and missing costs; they are not firm prices or delivery promises.
 
@@ -59,7 +59,7 @@ python3 skills/printrelay-hardware/scripts/printrelay.py order \
 
 Before accepting an offer, verify the CAD/specification fingerprints, all manufacturing choices, complete destination, manufacturing + handling + shipping + tax total, expiry and delivery terms. Accept only the exact customer-approved offer. The operator will provide verified payment instructions later; the current API's `payment_link:null` is not a checkout URL, and there are no payment-link notifications or webhooks promised. Reconcile uncertain writes by reading the saved order and reusing the identical payload/key.
 
-Ordinary in-stock offers target dispatch within two business days **after confirmed payment**, Monday–Friday in America/Chicago; actual terms and holiday exceptions belong in the offer. Ground shipping is free to the contiguous US/DC; verified next-day transit is $7.50 **after dispatch**. An arrival commitment is separate. Multicolor uses an operator-reviewed 3MF object map, one exact material grade, configured machine capacity and exact stock. Handling adds $3 per additional distinct color; manufacturing separately covers reviewed material, purge/support and machine costs. See the [full workflow](examples/manual-fdm.md) for limits and shipping details.
+For new offers under the planned authorization policy, ordinary in-stock dispatch is within two business days **after confirmed card authorization**, Monday–Friday in America/Chicago. The current evidence-only schema still uses a confirmed-payment clock and must be versioned before enabling that policy; actual returned terms and holiday exceptions govern the offer. Ground shipping is free to the contiguous US/DC; verified next-day transit is $7.50 **after dispatch**. An arrival commitment is separate. Multicolor uses an operator-reviewed 3MF object map, one exact material grade, configured machine capacity and exact stock. Handling adds $3 per additional distinct color; manufacturing separately covers reviewed material, purge/support and machine costs. See the [full workflow](examples/manual-fdm.md) for limits and shipping details.
 
 ## Give the product feedback
 
@@ -83,3 +83,14 @@ The private receipt is not an order or a support guarantee. Do not include crede
 ![Original enclosure model rendered in Blender as an exploded assembly.](examples/enclosure/enclosure-preview.png)
 
 Run local checks with `python3 -m unittest discover -s tests -v` and `python3 examples/enclosure/verify.py --check`. Public [registry metadata](registry/README.md) is tracked separately from source releases; a listing does not establish successful integration or fulfillment.
+
+## Materials, colors, fit and payment guides
+
+Request any current Bambu Lab model filament and its offered colors by exact product. Accepted intake families are PLA, PETG, ABS, ASA, PC, TPU, PET, PA, PA6, PA12, PPA and PPS; PA12 is retained for general intake/advice, not a claim of a verified Bambu retail SKU. Specify the exact grade, product and color identifier; blends and reinforcement variants stay within their base family. This is nonbinding intake, not a claim of stocked or compatible capacity. Every offer requires exact compatibility, stock and sourcing review. Firm production offers currently support verified PLA/PETG only. Support-only filaments are not model-material choices. No universal finished-part dimensional tolerance is promised; specify critical dimensions and allowed deviations for a job-specific offer.
+
+Planned payment policy: after you approve the exact full-price offer, a secure link will authorize a card hold. We charge only when your part ships. A hold can reduce your available card balance and expires on the issuer/network deadline; an expired hold requires fresh authorization, never an early charge merely to preserve it. Stripe activation and this flow are pending; current request submission is free and returns no payment URL.
+
+- [Bambu material request guide](https://partsforagents.com/guides/bambu-filament-materials)
+- [Color and multicolor handoff](https://partsforagents.com/guides/colors-and-multicolor)
+- [Dimensional tolerances and fit](https://partsforagents.com/guides/dimensional-tolerances-and-fit)
+- [Payments and shipping](https://partsforagents.com/guides/payments-and-shipping)

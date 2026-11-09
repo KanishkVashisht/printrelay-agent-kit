@@ -1,6 +1,6 @@
 # One exact FDM offer, then tracked fulfillment
 
-This is the partsforagents 0.8 customer workflow for owner-operated FDM. It does not submit to a supplier, move money or send printer commands. Free advice and specialist DFM review remain separate from a manufacturing offer. Read [current capabilities](https://partsforagents.com/api/capabilities) before beginning; the owner reports the printer ready, but live configured stock, exact job capacity and payment readiness determine whether an offer can be issued.
+This is the partsforagents 0.9 customer workflow for nonbinding FDM requests and exact offers. It does not submit to a supplier, move money or send printer commands. Free advice and specialist DFM review remain separate from a manufacturing offer. Read [current capabilities](https://partsforagents.com/api/capabilities) before beginning; configured stock, compatibility, exact job capacity and payment readiness determine whether an offer can be issued.
 
 Use external MCP at `https://partsforagents.com/api/mcp` with an account key, or native `https://printrelay.kva1.chatgpt.site/mcp` through Sites OAuth. The bundled Python CLI supports intake, specification JSON and nonbinding requests. It also supports public `production-capabilities`, owned `fulfillment ORDER_ID` and public `feedback`. **Use MCP/REST for multicolor mapping and offer acceptance**; the client has no dedicated commands for those writes. [Tool schemas](https://partsforagents.com/tools.json) and [OpenAPI](https://partsforagents.com/openapi.json) are authoritative.
 
@@ -8,9 +8,9 @@ Use external MCP at `https://partsforagents.com/api/mcp` with an account key, or
 
 Call `get_production_capabilities` with `{}`, or read public `GET https://partsforagents.com/api/production-capabilities`. It is one of three read tools on unauthenticated `/api/advice/mcp`; the fourth tool submits product feedback.
 
-Read `manual_fulfillment_ready`, `issues` and `available_materials`. The owner reports an X2D ready with red, blue and yellow PLA/PETG; exact configured grades, usable quantities, installed multicolor capability and payment readiness still need to match each offer. Only returned material grades/colors represent configured available stock; quantity is confirmed by an exact offer. Other Bambu PLA/PETG products and named colors can be sourced after checking the exact product, compatibility and availability. Procurement lead time must be resolved before offering the production schedule; do not silently substitute a product or color.
+Read `manual_fulfillment_ready`, `issues` and `available_materials`. Request any current Bambu Lab model filament and its offered colors by exact product. Accepted intake families are PLA, PETG, ABS, ASA, PC, TPU, PET, PA, PA6, PA12, PPA and PPS; PA12 is retained for general intake/advice, not a claim of a verified Bambu retail SKU. Specify the exact grade, product and color identifier; blends and reinforcement variants stay within their base family. This is nonbinding intake, not a claim of stocked or compatible capacity. Every offer requires exact compatibility, stock and sourcing review. Firm production offers currently support verified PLA/PETG only. Support-only filaments are not model-material choices. No universal finished-part dimensional tolerance is promised; specify critical dimensions and allowed deviations for a job-specific offer.
 
-Single-color parts use one exact named color. Multicolor permits 2–25 distinct named colors in the same family and exact grade, using object-mapped 3MF only and within the configured printer's verified capacity. Bambu's official maximum of 25 colors requires an expanded AMS setup; installed AMS units and routing are not assumed. PLA/PETG is a family choice, not blanket compatibility for every Bambu variant through every nozzle: for example, PLA Aero cannot use X2D's auxiliary hotend. Confirm exact stock, nozzle/routing compatibility and slicer settings before an offer. [Official X2D capacity FAQ](https://bambulab.cn/zh-cn/x2d/faq) · [Official X2D manual, sections 2.7 and 8.2](https://csm.bblcdn.com/hub/7c58718aaa2e40edab56efb87419a96a.pdf)
+Single-color parts use one exact named color. The current PLA/PETG multicolor contract uses an exact 3MF object-to-color map in one material family and grade. The request schema accepts 2–25 colors, but this is not a promise of available color capacity. Each offer requires verified capacity, exact grade/color stock and a reviewed map. No silent material, grade or color substitutions.
 
 Upload only authorized CAD, inspect preflight and pin the full specification. A firm offer requires the complete shipping address and recipient, as well as exact units, quantity, FDM process, material grade, color, finish, settings, original requirements and an explicit arrival requirement or `null`. A quote-stage specification without a street address can be retained, but cannot receive a firm offer. Pin a new complete specification before creating the matching manufacturing request; an existing request remains bound to its original fingerprint.
 
@@ -60,9 +60,9 @@ Multicolor is owner-manual only: `request_provider_comparison` rejects version 2
 
 ## Read production and shipping terms separately
 
-The production offer specifies dispatch within two business days after confirmed payment. Business days are Monday–Friday in America/Chicago; carrier-holiday exceptions must be disclosed in the exact offer. Read the returned `production_terms` and dated commitments rather than starting the clock at request creation, offer acceptance, invoice creation or an unverified payment claim. Stock sourcing and compatibility review must be complete before this schedule is offered. The two-business-day window is for production and dispatch, not arrival at the customer.
+The planned customer policy is dispatch within two business days after confirmed card authorization for new ordinary in-stock offers, with charge captured only at shipment. Stripe activation and that integration are pending. The current evidence-only API still uses confirmed payment as its dispatch basis; the legacy schema below documents those existing records and is not the authorization-based flow. Business days are Monday–Friday in America/Chicago; carrier-holiday exceptions must be disclosed in the exact offer. Read the returned `production_terms` and dated commitments rather than starting the clock at request creation, offer acceptance, invoice creation or an unverified payment claim. Stock sourcing and compatibility review must be complete before this schedule is offered. The two-business-day window is for production and dispatch, not arrival at the customer.
 
-New version 2 offers bind these production terms:
+The current evidence-only version 2 offer schema binds these terms. Do not change the clock string or treat a hold as confirmed payment to make it fit the planned policy; the payment integration must version the contract first:
 
 ```json
 {
@@ -76,7 +76,7 @@ New version 2 offers bind these production terms:
 }
 ```
 
-The clock starts from the recorded confirmed payment's `observed_at`. The production clock reports `absolute_dispatch_deadline:null`; it does not calculate a calendar due date automatically. Preserve any explicitly supported dates in the offer rather than deriving a guaranteed delivery date from the relative policy.
+For that current schema, the clock starts from the recorded confirmed payment's `observed_at`. The production clock reports `absolute_dispatch_deadline:null`; it does not calculate a calendar due date automatically. Preserve any explicitly supported dates in the offer rather than deriving a guaranteed delivery date from the relative policy.
 
 Origin is ZIP 60611; initial coverage is the contiguous US and DC. Supply recipient, street, city, two-letter state and ZIP. Alaska, Hawaii, territories and military destinations are outside this policy.
 
@@ -121,10 +121,21 @@ For REST, omit `order_id` and `idempotency_key` from that JSON, add `type:"accep
 
 ## Track facts and reconcile uncertainty
 
-Acceptance records agreement and leaves payment/printing unexecuted. Once the operator has verified Stripe account readiness, a separately prepared hosted invoice may collect the exact accepted full USD amount. No ready Stripe account or automatic payment integration is implied. The operator reconciles the underlying successful payment, not an invoice status alone; invoice and processing fees belong in operator economics, not an invented customer price. Read fulfillment for payment and production status, QC, shipment/tracking, delivery, refund or resolution facts. Operator evidence, payment references and private printer details are not included in the customer view. A payment record alone is not evidence that production started; shipment is not delivery.
+Acceptance records agreement and leaves payment/printing unexecuted. Automatic collection is disabled. Planned payment policy: after you approve the exact full-price offer, a secure link will authorize a card hold. We charge only when your part ships. A hold can reduce your available card balance and expires on the issuer/network deadline; an expired hold requires fresh authorization, never an early charge merely to preserve it. Stripe activation and this flow are pending; current request submission is free and returns no payment URL. An authorization is not a captured payment. Existing manual records are evidence-only and must not be used to imply that the planned card-hold/capture flow is active. An ordinary automatically captured invoice is not a substitute for authorization-only checkout. Read fulfillment for payment and production status, QC, shipment/tracking, delivery, refund or resolution facts. Operator evidence, payment references and private printer details are not included in the customer view. A payment record alone is not evidence that production started; shipment is not delivery.
 
 After an uncertain acceptance response, read this same order first. Retry only the identical body and key; never automatically create a replacement order or key. A conflict requires reconciliation. A replay can return the current, later fulfillment state, so read its actual status rather than assuming the original stage is still current.
 
 The pilot supports one exact payment, one production attempt, one shipment and one full refund per order. Partial payments/refunds, split shipments and automatic remakes are unsupported. `outcome_unknown` requires operator reconciliation against the original attempt identity; it is not failure or permission to retry a physical or financial action.
 
 Eligible nonbinding requests can use `cancel_order`; accepted or active work requires operator resolution. Cancellation never stops a printer, erases confirmed facts or resolves an unknown payment. Any eventual printer transmission requires immediate explicit confirmation for the specific job and target printer. Never interfere with a print owned by someone else or whose ownership is unknown.
+
+## Materials, colors, fit and payment guides
+
+Request any current Bambu Lab model filament and its offered colors by exact product. Accepted intake families are PLA, PETG, ABS, ASA, PC, TPU, PET, PA, PA6, PA12, PPA and PPS; PA12 is retained for general intake/advice, not a claim of a verified Bambu retail SKU. Specify the exact grade, product and color identifier; blends and reinforcement variants stay within their base family. This is nonbinding intake, not a claim of stocked or compatible capacity. Every offer requires exact compatibility, stock and sourcing review. Firm production offers currently support verified PLA/PETG only. Support-only filaments are not model-material choices. No universal finished-part dimensional tolerance is promised; specify critical dimensions and allowed deviations for a job-specific offer.
+
+Planned payment policy: after you approve the exact full-price offer, a secure link will authorize a card hold. We charge only when your part ships. A hold can reduce your available card balance and expires on the issuer/network deadline; an expired hold requires fresh authorization, never an early charge merely to preserve it. Stripe activation and this flow are pending; current request submission is free and returns no payment URL.
+
+- [Bambu material request guide](https://partsforagents.com/guides/bambu-filament-materials)
+- [Color and multicolor handoff](https://partsforagents.com/guides/colors-and-multicolor)
+- [Dimensional tolerances and fit](https://partsforagents.com/guides/dimensional-tolerances-and-fit)
+- [Payments and shipping](https://partsforagents.com/guides/payments-and-shipping)
