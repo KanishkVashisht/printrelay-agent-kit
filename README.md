@@ -2,7 +2,7 @@
 
 **Free manufacturing advice, exact FDM offers and tracked handoffs for agents.** Give a coding or CAD agent a repeatable path from an exported model to a reviewed specification and, when configured, an owner-fulfilled FDM offer.
 
-This repository contains an Agent Skill, a Python standard-library client, an editable two-part enclosure workflow and an owned 20 mm test model. PrintRelay 0.6 provides free sourced advice, bounded preliminary DFM, an explicitly uncalibrated budget preview and free asynchronous specialist review. Manufacturing is an owner-operated FDM pilot: exact offers, customer acceptance and recorded payment/production/shipping facts are supported. Stock, printers and payment readiness start unconfigured; proposed red, blue and yellow are not stocked promises. Each part uses one exact color. No endpoint moves money or transmits a print, and federated suppliers are deferred. Geometry checks do not certify printability.
+This repository contains an Agent Skill, a Python standard-library client, an editable two-part enclosure workflow and an owned 20 mm test model. PrintRelay 0.7 provides free sourced advice, bounded preliminary DFM, an explicitly uncalibrated budget preview and free asynchronous specialist review. Manufacturing is an owner-operated FDM pilot: exact offers, customer acceptance and recorded payment/production/shipping facts are supported. The owner has specified X2D and PLA/PETG, while exact stock, machine capability and payment readiness still require verification. Single-color parts use red, blue or yellow; multicolor supports two or three of those colors in one exact material grade, using an operator-reviewed object map in the uploaded 3MF. Proposed colors are not stocked promises. No endpoint moves money or transmits a print, and federated suppliers are deferred. Geometry checks do not certify printability.
 
 [Agent home](https://partsforagents.com/) · [For humans](https://partsforagents.com/for-humans) · [API guide](https://partsforagents.com/docs) · [OpenAPI](https://partsforagents.com/openapi.json) · [Current capabilities](https://partsforagents.com/api/capabilities)
 
@@ -54,7 +54,7 @@ Use the native PrintRelay OAuth connection to register a key generated and saved
 | Route | Authentication | Purpose |
 | --- | --- | --- |
 | `https://partsforagents.com/api/advice/mcp` | None | 3 public tools: service status, sourced advice and production capabilities. |
-| Python client / REST | Account-scoped API key | Intake, exact-spec analysis and nonbinding requests. The CLI has no offer-acceptance or fulfillment commands; use MCP/REST for those. |
+| Python client / REST | Account-scoped API key | Intake, exact-spec analysis and nonbinding requests. Use MCP/REST for multicolor mapping, production capabilities, offer acceptance and fulfillment; the unchanged CLI has no dedicated commands for these workflows. |
 | `https://partsforagents.com/api/mcp` | `Authorization: Bearer` followed by the same API key | 20 workflow tools for external MCP clients supporting Streamable HTTP and custom headers. |
 | `https://printrelay.kva1.chatgpt.site/mcp` | Sites OAuth through the native integration | 23 tools: the workflow tools plus native-only key registration/list/revoke. The REST API key is not an OAuth credential. |
 
@@ -66,9 +66,11 @@ After authorized intake and a pinned specification, the [skill workflow](skills/
 
 ## Read, approve and track one exact FDM offer
 
-Use `get_production_capabilities` first. `available_materials` identifies actual configured grades/colors; an empty list or `manual_fulfillment_ready:false` is a setup blocker. Stock does not guarantee that a particular job fits or that its full quantity is available. Read `get_order_fulfillment` for the offer, full canonical specification, destination, complete USD price and current revision. Only after the customer explicitly approves those exact terms, call `accept_order_offer` with the returned identity, fingerprint, amount and a saved retry key.
+Use `get_production_capabilities` first. `available_materials` identifies actual configured grades/colors; an empty list or `manual_fulfillment_ready:false` is a setup blocker. Stock does not guarantee that a particular job fits or that its full quantity is available. For multicolor, preserve actual 3MF object selectors, CAD SHA and color-plan/specification fingerprints; the operator must inspect the map before issuing an offer. Read `get_order_fulfillment` for the full canonical specification/color plan, exact allocations, destination, shipping terms, complete USD price and current revision. Only after the customer explicitly approves those exact terms, call `accept_order_offer` with the returned identity, fingerprint, amount and a saved retry key.
 
-Acceptance records agreement; it does not charge or authorize printing. Continue reading fulfillment for actual payment, production, QC, shipment, delivery or resolution facts. The pilot supports one exact payment, one shipment and one full refund, without partials, split shipments or automatic remakes. [The workflow](examples/manual-fdm.md) gives the exact MCP/REST mapping and retry rules.
+Shipping starts at ZIP 60611 with contiguous-US/DC coverage: ground is free; next-day is $7.50 for transit after dispatch, subject to actual route verification. Production time is separate and no arrival guarantee is implied. Exact shipping terms belong in the offer.
+
+Acceptance records agreement; it does not charge or authorize printing. Continue reading fulfillment for actual payment, production, QC, shipment, delivery or resolution facts. A separately prepared Stripe-hosted invoice can follow exact acceptance once payment-account readiness is verified; account eligibility is not assumed. The pilot supports one exact payment, one production attempt, one shipment and one full refund, without partials, split shipments or automatic remakes. [The workflow](examples/manual-fdm.md) gives the exact MCP/REST mapping and retry rules.
 
 ## Build a real CAD handoff
 
