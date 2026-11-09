@@ -36,6 +36,8 @@ The client and geometry checks use Python 3's standard library. Blender is neede
 
 ## Connect MCP or REST
 
+Try the [tested, model-free FastMCP and Google ADK client examples](examples/clients/) to read free manufacturing advice without an account, API key or CAD upload.
+
 | Route | Authentication | Tools |
 | --- | --- | --- |
 | `https://partsforagents.com/api/advice/mcp` | None | 4 public tools: service status, manufacturing advice, production capabilities and feedback submission. |
