@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Free advice, exact-CAD analysis and nonbinding review requests. No payment or print commands."""
+"""Parts for Agents: advice, FDM job requests, tracking and feedback. No payment or print commands."""
 import argparse, hashlib, json, os, re, sys, urllib.request, urllib.error, urllib.parse, uuid
 from pathlib import Path
-BASE='https://printrelay.kva1.chatgpt.site'
+BASE='https://partsforagents.com'
 class NoRedirect(urllib.request.HTTPRedirectHandler):
  def redirect_request(self, req, fp, code, msg, headers, newurl):
   raise RuntimeError('Unexpected API redirect; credential not forwarded.')
@@ -15,7 +15,7 @@ def call(path,method='GET',body=None,content_type='application/json',idem=None,p
    from bootstrap_key import prepare
    key=prepare(key_file,resume=True)
  if not key and not public:raise ValueError('Set PRINTRELAY_API_KEY securely in the environment.')
- headers={'User-Agent':'PrintRelay/0.5 (+https://printrelay.kva1.chatgpt.site)','Accept':'application/json'}
+ headers={'User-Agent':'PrintRelay/0.8 (+https://partsforagents.com)','Accept':'application/json'}
  if not public:headers['Authorization']='Bearer '+key
  if body is not None:headers['Content-Type']=content_type
  if idem:headers['Idempotency-Key']=idem
@@ -24,7 +24,7 @@ def call(path,method='GET',body=None,content_type='application/json',idem=None,p
   with urllib.request.build_opener(NoRedirect).open(req,timeout=60) as response:return json.load(response)
  except urllib.error.HTTPError as error:
   text=error.read(8192).decode('utf-8','replace');raise RuntimeError(f'API returned {error.code}: {text}') from None
- except (TimeoutError,urllib.error.URLError):raise RuntimeError('Network outcome is uncertain. Read requests/orders before retrying. Retry a write only with IDENTICAL content and the SAME idempotency key; never generate a replacement key automatically.') from None
+ except (TimeoutError,urllib.error.URLError):raise RuntimeError('Network outcome is uncertain. Read the saved request/order before retrying when a read is available. Feedback has no public lookup: replay its IDENTICAL saved body and SAME key to obtain the receipt. Never generate a replacement key automatically.') from None
 def request_id(value):
  if not isinstance(value,str) or not re.fullmatch(r'req_[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}',value):raise ValueError('Invalid request ID.')
  return value
@@ -41,6 +41,21 @@ def json_file(path):
  body=json.loads(Path(path).read_text())
  if not isinstance(body,dict):raise ValueError('JSON file must contain one object.')
  return body
+def feedback_body(body):
+ allowed={'category','message','consent','agent_name','context_path'}
+ if set(body)-allowed:raise ValueError('Only documented feedback fields are accepted; omit credentials, CAD and private customer/payment details.')
+ if body.get('category') not in ('bug','docs','feature','ordering','pricing','other'):raise ValueError('Choose a documented feedback category.')
+ if body.get('consent') is not True:raise ValueError('Feedback requires consent:true for non-sensitive product feedback.')
+ for name,limit in (('message',4000),('agent_name',80),('context_path',240)):
+  if name not in body and name!='message':continue
+  value=body.get(name)
+  if not isinstance(value,str) or not value.strip() or len(value.encode('utf-16-le'))//2>limit or re.search(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]',value):raise ValueError(name+' must be bounded nonempty plain text; omit empty optional fields.')
+ if 'context_path' in body:
+  path=body['context_path'].strip()
+  if not re.fullmatch(r'/[A-Za-z0-9_./-]*',path) or path.startswith('//') or any(part in ('.','..') for part in path.split('/')):raise ValueError('context_path must be a same-site pathname without query, fragment, IDs, secrets or dot segments.')
+ if re.search(r'\b(?:pr_key_[a-f0-9]{64}|(?:sk|rk)_(?:live|test)_[A-Za-z0-9]+|Bearer\s+[A-Za-z0-9._~+/-]{16,})\b','\n'.join(str(body.get(name,'')) for name in ('message','agent_name','context_path')),re.I):raise ValueError('Remove credentials from feedback.')
+ return body
+
 def multipart(file_path,fields):
  path=Path(file_path);data=path.read_bytes()
  if not 0<len(data)<=10*1024*1024:raise ValueError('CAD must be nonempty and at most10MiB.')
@@ -52,29 +67,33 @@ def multipart(file_path,fields):
  return b''.join(chunks),'multipart/form-data; boundary='+boundary,hashlib.sha256(data).hexdigest()
 def main(argv=None):
  parser=argparse.ArgumentParser(description=__doc__);sub=parser.add_subparsers(dest='command',required=True)
- for name in ('list','capabilities','example','orders'):sub.add_parser(name)
+ for name in ('list','capabilities','production-capabilities','example','orders'):sub.add_parser(name)
  for name in ('get','quotes','jobs','preflight','specifications'):
   p=sub.add_parser(name);p.add_argument('request_id',type=request_id)
  p=sub.add_parser('advice',help='Free public guidance; no key or CAD needed.')
  p.add_argument('--topic',choices=['getting_started','mesh','fdm','materials','fits','sls','costs']);p.add_argument('--process');p.add_argument('--material')
  for name in ('analyze','estimate'):
   p=sub.add_parser(name);p.add_argument('request_id',type=request_id);p.add_argument('--fingerprint',required=True,type=fingerprint)
- for name in ('order-status','cancel-order'):
+ for name in ('order-status','cancel-order','fulfillment'):
   p=sub.add_parser(name);p.add_argument('order_id',type=order_id)
- p=sub.add_parser('order',help='Create a NONBINDING review request, not a supplier order.')
+ p=sub.add_parser('feedback',help='Submit non-sensitive product feedback publicly, with no account key.')
+ p.add_argument('--json-file',required=True,help='category, message, consent:true; optional agent_name/context_path.')
+ p.add_argument('--idempotency-key',required=True,type=idempotency_key,help='Save and reuse with identical JSON after uncertainty.')
+ p=sub.add_parser('order',help='Submit a NONBINDING job/review request now; an accepted offer and payment instructions follow review.')
  p.add_argument('--json-file',required=True,help='Exact request/spec, order_type and acknowledge_nonbinding:true; see SKILL.md.')
  p.add_argument('--idempotency-key',required=True,type=idempotency_key,help='Save and reuse with identical JSON after uncertainty.')
  p=sub.add_parser('upload');p.add_argument('file');p.add_argument('--email',required=True);p.add_argument('--material',choices=['PLA','PETG','PA12'],required=True);p.add_argument('--quantity',type=int,required=True);p.add_argument('--units',choices=['mm','inch'],required=True);p.add_argument('--country',required=True);p.add_argument('--postal-code',required=True);p.add_argument('--speed',choices=['standard','fastest'],default='standard');p.add_argument('--notes',default='');p.add_argument('--idempotency-key',required=True,type=idempotency_key);p.add_argument('--consent',action='store_true',required=True,help='Confirm the owner authorized intake upload.')
  p=sub.add_parser('specification');p.add_argument('request_id',type=request_id);p.add_argument('--json-file',required=True)
  p=sub.add_parser('compare');p.add_argument('request_id',type=request_id);p.add_argument('--fingerprint',required=True,type=fingerprint);p.add_argument('--providers',nargs='+',choices=['craftcloud','treatstock','xometry','jlc3dp','pcbway'],required=True);p.add_argument('--allow-provider-upload',action='store_true',required=True,help='Confirm owner authorized CAD upload to each named provider.')
  args=parser.parse_args(argv)
- if args.command in ('capabilities','example'):result=call('/api/capabilities' if args.command=='capabilities' else '/examples/calibration-cube-20mm.preflight.json',public=True)
+ if args.command in ('capabilities','production-capabilities','example'):result=call({'capabilities':'/api/capabilities','production-capabilities':'/api/production-capabilities','example':'/examples/calibration-cube-20mm.preflight.json'}[args.command],public=True)
+ elif args.command=='feedback':result=call('/api/feedback','POST',json.dumps(feedback_body(json_file(args.json_file)),ensure_ascii=False).encode(),idem=args.idempotency_key,public=True)
  elif args.command=='advice':
   query=urllib.parse.urlencode({k:getattr(args,k) for k in ('topic','process','material') if getattr(args,k) is not None});result=call('/api/advice'+('?' + query if query else ''),public=True)
  elif args.command=='list':result=call('/api/v1/requests')
  elif args.command=='orders':result=call('/api/v1/orders')
- elif args.command in ('order-status','cancel-order'):
-  result=call('/api/v1/orders/'+args.order_id+('/cancel' if args.command=='cancel-order' else ''),'POST' if args.command=='cancel-order' else 'GET')
+ elif args.command in ('order-status','cancel-order','fulfillment'):
+  result=call('/api/v1/orders/'+args.order_id+{'order-status':'','cancel-order':'/cancel','fulfillment':'/fulfillment'}[args.command],'POST' if args.command=='cancel-order' else 'GET')
  elif args.command in ('analyze','estimate'):
   result=call('/api/v1/requests/'+args.request_id+('/advice' if args.command=='analyze' else '/estimate')+'?'+urllib.parse.urlencode({'spec_fingerprint':args.fingerprint}))
  elif args.command=='order':

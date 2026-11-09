@@ -1,14 +1,14 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.KanishkVashisht/printrelay",
-  "title": "PrintRelay",
-  "description": "Free manufacturing advice, preliminary DFM and nonbinding review requests. No payment or printing.",
-  "version": "0.5.0",
-  "websiteUrl": "https://printrelay.kva1.chatgpt.site/docs",
+  "title": "Parts for Agents",
+  "description": "DFM advice, FDM job requests and tracking for AI agents. Submit now; pay after an accepted offer.",
+  "version": "0.8.0",
+  "websiteUrl": "https://partsforagents.com/docs",
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://printrelay.kva1.chatgpt.site/api/mcp",
+      "url": "https://partsforagents.com/api/mcp",
       "headers": [
         {
           "name": "Authorization",

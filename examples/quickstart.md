@@ -38,7 +38,7 @@ Read the returned capability **statuses**, not just the HTTP success:
 | `supplier_quote_collection` / `supplier_worker_readiness` | Federated supplier execution is `deferred`; `not_verified` establishes no supplier pricing. |
 | `payment` / `purchase` / `print_transmission` | The beta reports these as `disabled`. Do not tell the owner a part was bought or printed. |
 
-If a command fails, stop at that stage. Do not upload CAD to troubleshoot a public-read failure. Public MCP at `https://partsforagents.com/api/advice/mcp` exposes 3 read-only tools, including `get_production_capabilities`; REST provides `GET https://partsforagents.com/api/production-capabilities` without a key. The Python CLI has no production-capabilities command.
+If a command fails, stop at that stage. Do not upload CAD to troubleshoot a public-read failure. Public MCP at `https://partsforagents.com/api/advice/mcp` exposes 3 read-only tools plus `submit_agent_feedback`, a public write. The client `production-capabilities` command and `GET https://partsforagents.com/api/production-capabilities` need no key.
 
 ## Connect an account only when needed
 
@@ -57,7 +57,7 @@ python3 skills/printrelay-hardware/scripts/printrelay.py list
 
 This reads your owned requests; an empty successful result is fine. Keep the response private. A 401 or missing-key error means setup is incomplete. Do not generate multiple keys to resolve an uncertain registration: use the helper's documented `--resume` procedure.
 
-External MCP uses `https://partsforagents.com/api/mcp` with the same account key in an Authorization Bearer header through the host's secret mechanism (20 workflow tools). Native `https://printrelay.kva1.chatgpt.site/mcp` uses the separate Sites OAuth connection (23 tools, including native-only key management). The unchanged Python client still calls the original Sites host; do not invent new CLI commands for the 0.6 offer/tracking tools. If neither connection nor signed-in console is available, retain the successful local/public check and stop here; no account creation or authenticated success is implied.
+External MCP uses `https://partsforagents.com/api/mcp` with the same account key in an Authorization Bearer header through the host's secret mechanism (21 workflow tools). Native `https://printrelay.kva1.chatgpt.site/mcp` uses the separate Sites OAuth connection (24 tools, including native-only key management). The Python client calls `partsforagents.com`. It supports `production-capabilities` and `fulfillment ORDER_ID` reads; use MCP/REST for exact offer acceptance and multicolor mapping. If neither connection nor signed-in console is available, retain the successful local/public check and stop here; no account creation or authenticated success is implied.
 
 ## Choose one bounded handoff
 
@@ -70,6 +70,33 @@ Give your agent this task after reviewing the files:
 
 Keep request IDs, CAD hashes, specification fingerprints and retry keys privately. Changed CAD or immutable intake fields need a new request. Changed manufacturing choices can receive a new specification fingerprint on the existing request, as supported by the live schema. A timeout retry reuses the same saved key and payload. For an owner-fulfilled FDM request after the exercise, read the [offer and tracking workflow](manual-fdm.md). A complete shipping specification must be pinned before a firm offer; a changed spec needs a new matching nonbinding request. Review actual stocked grade and one exact color per part. Do not submit to deferred supplier workflows merely to test setup.
 
+## Submit a real job when ready
+
+The examples above are optional local exercises, not required customer activity. For an actual authorized job, upload its CAD, inspect preflight and pin its exact FDM specification. Call `place_order` with the returned `request_id`, `spec_fingerprint`, `order_type:"manufacturing"`, `acknowledge_nonbinding:true` and a saved idempotency key. The REST equivalent is `POST /api/v1/orders`; the Python helper accepts the same body from a private JSON file:
+
+```sh
+python3 skills/printrelay-hardware/scripts/printrelay.py order \
+  --json-file /private/path/job.json --idempotency-key SAVED_UNIQUE_KEY
+```
+
+Submit now; the payment link comes later after review and exact-offer acceptance. The request records `pending_review`, requires no payment and books no capacity. `payment_required_on_submission:false`, `payment_link:null` and `payment_link_status:"after_review_if_accepted"` describe the current manufacturing flow. Stripe setup is pending and no automatic link delivery is implemented; there is no promised review/payment-link turnaround. Free specialist requests use `dfm_review` and need no payment.
+
+Read `order-status ORDER_ID` for review status and `fulfillment ORDER_ID` for any exact offer and fulfillment facts. A missing fulfillment record before an offer is normal. Once an offer exists, `get_order_fulfillment` is authoritative: the backlog can still say `pending_review` after acceptance, so inspect fulfillment status, acceptance and recorded facts. Never infer successful payment or printing from a backlog request. Follow [manual FDM](manual-fdm.md) to inspect the exact price, obtain customer approval, accept and track the job. The native tool name remains `place_order` for compatibility, but submitting it is a nonbinding request.
+
 ## Report useful setup feedback
 
 For a reproducible public client problem, report your OS, Python/client version, exact command with private values replaced, exit code, error code and the last successful stage. Distinguish local geometry, public reads, authentication, intake, an issued offer, acceptance and recorded fulfillment facts. Do not post keys, raw account-list output, customer CAD, shipping addresses or private request/quote IDs. An internal fixture test is technical validation, not a customer or manufacturing result.
+
+
+Send a concise non-sensitive report with public MCP `submit_agent_feedback` or `POST /api/feedback`. For the client, save this object privately, then use the saved retry key:
+
+```json
+{"category":"docs","message":"The setup instructions should explain the last successful step more clearly.","consent":true,"agent_name":"CAD assistant","context_path":"/docs"}
+```
+
+```sh
+python3 skills/printrelay-hardware/scripts/printrelay.py feedback \
+  --json-file /private/path/feedback.json --idempotency-key SAVED_FEEDBACK_KEY
+```
+
+No account key is sent. Omit empty optional fields. The response is a private receipt, not a public post or support promise. There is no public lookup; replay exactly the same body/key after uncertainty. Do not submit example feedback merely to test the live endpoint: local tests cover the helper without creating production records.

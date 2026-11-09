@@ -1,20 +1,40 @@
 # One exact FDM offer, then tracked fulfillment
 
-This is the PrintRelay 0.7.1 customer workflow for owner-operated FDM. It does not submit to a supplier, move money or send printer commands. Free advice and specialist DFM review remain separate from a manufacturing offer. Read [current capabilities](https://partsforagents.com/api/capabilities) before beginning; the default stock, printer and payment configuration is not ready.
+This is the Parts for Agents / PrintRelay 0.8 customer workflow for owner-operated FDM. It does not submit to a supplier, move money or send printer commands. Free advice and specialist DFM review remain separate from a manufacturing offer. Read [current capabilities](https://partsforagents.com/api/capabilities) before beginning; the owner reports the printer ready, but live configured stock, exact job capacity and payment readiness determine whether an offer can be issued.
 
-Use external MCP at `https://partsforagents.com/api/mcp` with an account key, or native `https://printrelay.kva1.chatgpt.site/mcp` through Sites OAuth. The bundled Python CLI supports intake, specification JSON and nonbinding requests. It has no dedicated color-plan workflow or production-capabilities, fulfillment or offer-acceptance commands. **Use MCP/REST for the new multicolor mapping and offer/tracking workflow**; do not invent CLI flags. Scripts are unchanged. [Tool schemas](https://partsforagents.com/tools.json) and [OpenAPI](https://partsforagents.com/openapi.json) are authoritative.
+Use external MCP at `https://partsforagents.com/api/mcp` with an account key, or native `https://printrelay.kva1.chatgpt.site/mcp` through Sites OAuth. The bundled Python CLI supports intake, specification JSON and nonbinding requests. It also supports public `production-capabilities`, owned `fulfillment ORDER_ID` and public `feedback`. **Use MCP/REST for multicolor mapping and offer acceptance**; the client has no dedicated commands for those writes. [Tool schemas](https://partsforagents.com/tools.json) and [OpenAPI](https://partsforagents.com/openapi.json) are authoritative.
 
 ## Check stock and preserve the exact part
 
-Call `get_production_capabilities` with `{}`, or read public `GET https://partsforagents.com/api/production-capabilities`. It is also one of the three tools on unauthenticated `/api/advice/mcp`.
+Call `get_production_capabilities` with `{}`, or read public `GET https://partsforagents.com/api/production-capabilities`. It is one of three read tools on unauthenticated `/api/advice/mcp`; the fourth tool submits product feedback.
 
-Read `manual_fulfillment_ready`, `issues` and `available_materials`. The owner has specified X2D and reports red, blue and yellow PLA/PETG; this does not verify exact grades, usable quantities, printer capability or payment readiness. Only returned material grades/colors represent configured available stock; quantity is confirmed by an exact offer. Other Bambu PLA/PETG products and named colors can be sourced after checking the exact product, compatibility and availability. Procurement lead time must be resolved before offering the production schedule; do not silently substitute a product or color.
+Read `manual_fulfillment_ready`, `issues` and `available_materials`. The owner reports an X2D ready with red, blue and yellow PLA/PETG; exact configured grades, usable quantities, installed multicolor capability and payment readiness still need to match each offer. Only returned material grades/colors represent configured available stock; quantity is confirmed by an exact offer. Other Bambu PLA/PETG products and named colors can be sourced after checking the exact product, compatibility and availability. Procurement lead time must be resolved before offering the production schedule; do not silently substitute a product or color.
 
 Single-color parts use one exact named color. Multicolor permits 2–25 distinct named colors in the same family and exact grade, using object-mapped 3MF only and within the configured printer's verified capacity. Bambu's official maximum of 25 colors requires an expanded AMS setup; installed AMS units and routing are not assumed. PLA/PETG is a family choice, not blanket compatibility for every Bambu variant through every nozzle: for example, PLA Aero cannot use X2D's auxiliary hotend. Confirm exact stock, nozzle/routing compatibility and slicer settings before an offer. [Official X2D capacity FAQ](https://bambulab.cn/zh-cn/x2d/faq) · [Official X2D manual, sections 2.7 and 8.2](https://csm.bblcdn.com/hub/7c58718aaa2e40edab56efb87419a96a.pdf)
 
 Upload only authorized CAD, inspect preflight and pin the full specification. A firm offer requires the complete shipping address and recipient, as well as exact units, quantity, FDM process, material grade, color, finish, settings, original requirements and an explicit arrival requirement or `null`. A quote-stage specification without a street address can be retained, but cannot receive a firm offer. Pin a new complete specification before creating the matching manufacturing request; an existing request remains bound to its original fingerprint.
 
 Create a nonbinding `manufacturing` or `quotation` request with `place_order`, or the existing client `order` command. Both require FDM. Save the order ID, CAD hash, specification fingerprint and creation retry key. Initial creation accepts no offer and authorizes no production. The backlog status can remain `pending_review` after an offer is accepted: once fulfillment exists, its `status`, `accepted` and recorded facts are authoritative. Never infer fulfillment state from `backlog_status`.
+
+## Submit the job now; receive payment instructions later
+
+After pinning the exact specification, the REST/client request body is:
+
+```json
+{
+  "request_id":"RETURNED_REQUEST_ID",
+  "spec_fingerprint":"EXACT_RETURNED_SPEC_HASH",
+  "order_type":"manufacturing",
+  "acknowledge_nonbinding":true,
+  "review_notes":"Review this exact FDM job and provide the complete offer before payment."
+}
+```
+
+Replace placeholders only with actual returned identities. Send it using `order --json-file PRIVATE_FILE --idempotency-key SAVED_KEY`, or `POST /api/v1/orders` with the saved `Idempotency-Key` header. MCP `place_order` uses the same fields plus `idempotency_key`. Use `quotation` for an FDM quote request or `dfm_review` for free specialist advice. Do not include an idempotency key inside REST JSON.
+
+A new manufacturing request returns `pending_review` with `payment_required_on_submission:false`, `payment_link:null` and `payment_link_status:"after_review_if_accepted"`. It is accepted for review without charging or booking capacity. A free DFM request reports `not_required`; cancelled requests report `not_applicable`. The operator is expected to provide a verified payment link later, after exact-offer acceptance and payment-account setup. There is no actual link, automatic link notification or guaranteed review turnaround currently implemented. Never create a payment URL or claim a pending request was paid.
+
+Read `order-status ORDER_ID` to inspect the saved request; `fulfillment ORDER_ID` reads any issued offer and recorded facts. A missing fulfillment record before an offer is normal. For an uncertain submission, read owned orders before retrying; preserve the original body and key. Continue with the exact-offer checks below before customer acceptance.
 
 ## Preserve a multicolor object map
 
