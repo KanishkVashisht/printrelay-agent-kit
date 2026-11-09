@@ -1,8 +1,8 @@
 # MCP Registry publication
 
-PrintRelay version **0.3.0** was published on 2026-11-06 and verified as active in the [official registry record](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.KanishkVashisht%2Fprintrelay/versions/0.3.0). `server.json` now prepares version **0.8.0** for a future registry update; that update has not been published. The active verified record remains **0.3.0**. `server.draft.json` is the retained original preparation file, not a separate listing.
+The server’s version **0.3.0** was published on 2026-11-06 and verified as active in the [official registry record](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.KanishkVashisht%2Fprintrelay/versions/0.3.0). `server.json` now prepares version **0.8.0** for a future registry update; that update has not been published. The active verified record remains **0.3.0**. `server.draft.json` is the retained original preparation file, not a separate listing.
 
-The prepared 0.8.0 record uses the Parts for Agents title and custom-domain external API-key MCP endpoint. The active 0.3.0 record still uses the earlier host and wording; this file does not claim an update was published. The record points to the external API-key MCP endpoint. Native Sites OAuth uses a separate route. Listing metadata does not imply endorsement, installation, successful onboarding, a supplier quote or a customer order.
+The prepared 0.8.0 record uses the partsforagents title and custom-domain external API-key MCP endpoint. The active 0.3.0 record still uses the earlier host and wording; this file does not claim an update was published. The record points to the external API-key MCP endpoint. Native Sites OAuth uses a separate route. Listing metadata does not imply endorsement, installation, successful onboarding, a supplier quote or a customer order.
 
 ## Updating the record
 

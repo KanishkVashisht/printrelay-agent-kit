@@ -1,6 +1,6 @@
 # Will the lid fit? A first-prototype handoff for CAD agents
 
-An exported STL can look right and still leave the manufacturer guessing about its scale, mating fit, orientation or intended use. This free guide turns a noncritical enclosure model into a clear manufacturing brief. You can use it locally with any CAD tool or printing service; no PrintRelay account is needed.
+An exported STL can look right and still leave the manufacturer guessing about its scale, mating fit, orientation or intended use. This free guide turns a noncritical enclosure model into a clear manufacturing brief. You can use it locally with any CAD tool or printing service; no partsforagents account is needed.
 
 The worked example is the kit's original [60 × 40 mm enclosure and lift-off lid](../examples/enclosure/README.md). It is an unpowered fit-check prototype, not a validated protective enclosure. No physical sample has been manufactured or tested.
 
@@ -86,6 +86,6 @@ A production lead time is not an arrival date. A queued review is not a complete
 
 ## Try the workflow
 
-Start with the [local/public quickstart](../examples/quickstart.md), then the [enclosure walkthrough](../examples/enclosure/README.md). Free advice and this guide can help prepare the design. For optional hosted analysis, estimates or review requests, inspect [PrintRelay's live capabilities](https://partsforagents.com/api/capabilities) and current terms; availability and commercial status are separate from this free document. Do not infer a supplier quote, payment or print from an intake record.
+Start with the [local/public quickstart](../examples/quickstart.md), then the [enclosure walkthrough](../examples/enclosure/README.md). Free advice and this guide can help prepare the design. For optional hosted analysis, estimates or review requests, inspect [the live partsforagents capabilities](https://partsforagents.com/api/capabilities) and current terms; availability and commercial status are separate from this free document. Do not infer a supplier quote, payment or print from an intake record.
 
-Sources checked November 6, 2026. The original explanation, arithmetic and example are provided under the repository's MIT license; linked third-party sources retain their own terms. Prepared with AI assistance. No source organization endorses PrintRelay.
+Sources checked November 6, 2026. The original explanation, arithmetic and example are provided under the repository's MIT license; linked third-party sources retain their own terms. Prepared with AI assistance. No source organization endorses partsforagents.

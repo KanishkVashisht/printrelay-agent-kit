@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.KanishkVashisht/printrelay",
-  "title": "Parts for Agents",
+  "title": "partsforagents",
   "description": "DFM advice, FDM job requests and tracking for AI agents. Submit now; pay after an accepted offer.",
   "version": "0.8.0",
   "websiteUrl": "https://partsforagents.com/docs",
@@ -12,10 +12,10 @@
       "headers": [
         {
           "name": "Authorization",
-          "description": "An account-scoped PrintRelay API key, including the Bearer prefix.",
+          "description": "An account-scoped partsforagents API key, including the Bearer prefix.",
           "isRequired": true,
           "isSecret": true,
-          "placeholder": "Bearer <your PrintRelay API key>"
+          "placeholder": "Bearer <your partsforagents API key>"
         }
       ]
     }

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Parts for Agents: advice, FDM job requests, tracking and feedback. No payment or print commands."""
+"""partsforagents: advice, FDM job requests, tracking and feedback. No payment or print commands."""
 import argparse, hashlib, json, os, re, sys, urllib.request, urllib.error, urllib.parse, uuid
 from pathlib import Path
 BASE='https://partsforagents.com'

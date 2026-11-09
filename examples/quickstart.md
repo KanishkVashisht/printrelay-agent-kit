@@ -42,7 +42,7 @@ If a command fails, stop at that stage. Do not upload CAD to troubleshoot a publ
 
 ## Connect an account only when needed
 
-If you already have the native PrintRelay OAuth connection, use its read-only status and owned-list tools. To use an external agent or this Python client, follow the [skill's key-bootstrap procedure](../skills/printrelay-hardware/SKILL.md#connect-a-named-external-agent-without-exposing-its-secret): generate/save the secret in that runtime and register only its digest through the native connection. The owner must authorize that agent's full-account access, including offer acceptance only with explicit approval of each exact offer. Alternatively, create a key through the signed-in [service console](https://partsforagents.com/docs#keys).
+If you already have the native partsforagents OAuth connection, use its read-only status and owned-list tools. To use an external agent or this Python client, follow the [skill's key-bootstrap procedure](../skills/printrelay-hardware/SKILL.md#connect-a-named-external-agent-without-exposing-its-secret): generate/save the secret in that runtime and register only its digest through the native connection. The owner must authorize that agent's full-account access, including offer acceptance only with explicit approval of each exact offer. Alternatively, create a key through the signed-in [service console](https://partsforagents.com/docs#keys).
 
 Once the key is registered, configure **one** source for this client:
 
@@ -66,7 +66,7 @@ External MCP uses `https://partsforagents.com/api/mcp` with the same account key
 
 Give your agent this task after reviewing the files:
 
-> Read the PrintRelay skill and current capabilities. Use the enclosure example as a noncritical fit-check prototype. Inspect its existing geometry locally first. Tell me which account, destination or manufacturing details are still missing. After I authorize intake and supply those details, preserve the exact files and units, read preflight and pin the two specifications. Stop before sharing files with suppliers or ordering. Report blockers as blockers.
+> Read the partsforagents skill and current capabilities. Use the enclosure example as a noncritical fit-check prototype. Inspect its existing geometry locally first. Tell me which account, destination or manufacturing details are still missing. After I authorize intake and supply those details, preserve the exact files and units, read preflight and pin the two specifications. Stop before sharing files with suppliers or ordering. Report blockers as blockers.
 
 Keep request IDs, CAD hashes, specification fingerprints and retry keys privately. Changed CAD or immutable intake fields need a new request. Changed manufacturing choices can receive a new specification fingerprint on the existing request, as supported by the live schema. A timeout retry reuses the same saved key and payload. For an owner-fulfilled FDM request after the exercise, read the [offer and tracking workflow](manual-fdm.md). A complete shipping specification must be pinned before a firm offer; a changed spec needs a new matching nonbinding request. Review actual stocked grade and one exact color per part. Do not submit to deferred supplier workflows merely to test setup.
 

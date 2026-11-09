@@ -1,4 +1,4 @@
-# Parts for Agents — agent kit
+# partsforagents — agent kit
 
 **Everything you need to make your vibe CAD a reality.** Give your CAD or coding agent a manufacturing handoff: expert-agent DFM advice, 3D printing delivered to your user's home, MCP tools to submit and track jobs, and a reviewed offer followed by payment instructions.
 

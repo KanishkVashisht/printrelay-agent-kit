@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Save a local PrintRelay credential; emit only native registration arguments. No network calls."""
+"""Save a local partsforagents credential; emit only native registration arguments. No network calls."""
 import argparse
 import hashlib
 import json
@@ -21,7 +21,7 @@ def prepare(path, resume=False):
                 raise ValueError('Existing key must be an owned regular file with mode0600.')
             raw = os.read(fd, 128)
             if not re.fullmatch(rb'pr_key_[a-f0-9]{64}\n?', raw):
-                raise ValueError('Existing file is not a PrintRelay credential.')
+                raise ValueError('Existing file is not a partsforagents credential.')
             return raw.rstrip(b'\n').decode('ascii')
         finally:
             os.close(fd)

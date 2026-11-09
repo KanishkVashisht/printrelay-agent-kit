@@ -8,7 +8,7 @@ The image is rendered from this source model. The lid is lifted 15 mm for visibi
 
 ## Give your CAD agent a concrete task
 
-> Use the PrintRelay agent kit's enclosure example as an editable starting point. Make a noncritical enclosure fit-check shell with 60 × 40 × 22 mm outer base dimensions, 2 mm walls and floor, a removable lid, and a centered 10 × 6 mm cable notch. Keep the nominal lid clearance at 0.3 mm per side. Export the two parts separately in explicit millimeters. Verify the exported dimensions and geometry. After I provide authorized account and destination details, upload the two parts to PrintRelay, inspect preflight, and pin exact specifications. Preserve the source revision and the two request IDs. Stop before supplier comparison or ordering.
+> Use the partsforagents agent kit's enclosure example as an editable starting point. Make a noncritical enclosure fit-check shell with 60 × 40 × 22 mm outer base dimensions, 2 mm walls and floor, a removable lid, and a centered 10 × 6 mm cable notch. Keep the nominal lid clearance at 0.3 mm per side. Export the two parts separately in explicit millimeters. Verify the exported dimensions and geometry. After I provide authorized account and destination details, upload the two parts to partsforagents, inspect preflight, and pin exact specifications. Preserve the source revision and the two request IDs. Stop before supplier comparison or ordering.
 
 For a different board, edit the parameters deliberately. Recompute the interior envelope, lip clearance and notch dimensions; update the requirements text and manufacturing choices before a new upload. Do not present the example's settings as recommendations for every enclosure.
 
@@ -74,7 +74,7 @@ blender --background --factory-startup --python-exit-code 1 \
 
 ## Measured evidence, with clear limits
 
-[`geometry-report.json`](geometry-report.json) records measurements from the included independent standard-library verifier, with hashes of the STL, parameters, source and verifier. [`preflight.local.json`](preflight.local.json) records a **local invocation** of PrintRelay's geometry analyzer on the same bytes. It is not a response from a customer upload or evidence of any supplier interaction.
+[`geometry-report.json`](geometry-report.json) records measurements from the included independent standard-library verifier, with hashes of the STL, parameters, source and verifier. [`preflight.local.json`](preflight.local.json) records a **local invocation** of the partsforagents geometry analyzer on the same bytes. It is not a response from a customer upload or evidence of any supplier interaction.
 
 | Export | Bounds in mm | Triangles | Enclosed mesh volume |
 | --- | --- | ---: | ---: |
@@ -87,7 +87,7 @@ Both exports have one connected component, zero boundary/non-manifold edges, con
 
 ## Optional agent handoff: upload → preflight → exact spec
 
-The local geometry steps above need no account. The following steps intentionally create private PrintRelay intake/specification records. Use them only when you intend that upload and have reviewed this example's choices. There are **two components, two requests and two fingerprints**; do not upload the lid as a second body in the base's file or call the pair quantity 2.
+The local geometry steps above need no account. The following steps intentionally create private partsforagents intake/specification records. Use them only when you intend that upload and have reviewed this example's choices. There are **two components, two requests and two fingerprints**; do not upload the lid as a second body in the base's file or call the pair quantity 2.
 
 1. Read the [live capabilities](https://partsforagents.com/api/capabilities) or run the client's `capabilities` command. Check that intake is available. This does not prove suppliers are connected.
 2. Follow the [first-run account setup](../quickstart.md#connect-an-account-only-when-needed). Configure exactly one of `PRINTRELAY_API_KEY_FILE` (private mode0600 file) or `PRINTRELAY_API_KEY` (runtime secret store), then verify read-only `list` succeeds. Set your actual authorized `PRINTRELAY_CONTACT_EMAIL`, two-letter `PRINTRELAY_COUNTRY` and `PRINTRELAY_POSTAL_CODE`. Keep them and API responses out of Git; `.local/` is ignored by this kit.
