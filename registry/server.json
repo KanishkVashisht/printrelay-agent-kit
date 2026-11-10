@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.KanishkVashisht/printrelay",
   "title": "partsforagents",
-  "description": "DFM advice, FDM job requests and tracking for AI agents. Submit now; pay after an accepted offer.",
-  "version": "0.9.0",
+  "description": "Free DFM advice for agents. Nonbinding exact-CAD FDM jobs and tracking; quote/payment after review.",
+  "version": "0.10.0",
   "websiteUrl": "https://partsforagents.com/docs",
   "remotes": [
     {
