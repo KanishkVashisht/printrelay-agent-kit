@@ -1,6 +1,6 @@
 # One exact FDM offer, then tracked fulfillment
 
-This is the partsforagents 0.9 customer workflow for nonbinding FDM requests and exact offers. It does not submit to a supplier, move money or send printer commands. Free advice and specialist DFM review remain separate from a manufacturing offer. Read [current capabilities](https://partsforagents.com/api/capabilities) before beginning; configured stock, compatibility, exact job capacity and payment readiness determine whether an offer can be issued.
+This is the partsforagents 0.10 customer workflow for nonbinding FDM requests and exact offers. It does not submit to a supplier, move money or send printer commands. Free advice and specialist DFM review remain separate from a manufacturing offer. Read [current capabilities](https://partsforagents.com/api/capabilities) before beginning; configured stock, compatibility, exact job capacity and payment readiness determine whether an offer can be issued.
 
 Use external MCP at `https://partsforagents.com/api/mcp` with an account key, or native `https://printrelay.kva1.chatgpt.site/mcp` through Sites OAuth. The bundled Python CLI supports intake, specification JSON and nonbinding requests. It also supports public `production-capabilities`, owned `fulfillment ORDER_ID` and public `feedback`. **Use MCP/REST for multicolor mapping and offer acceptance**; the client has no dedicated commands for those writes. [Tool schemas](https://partsforagents.com/tools.json) and [OpenAPI](https://partsforagents.com/openapi.json) are authoritative.
 
@@ -60,16 +60,16 @@ Multicolor is owner-manual only: `request_provider_comparison` rejects version 2
 
 ## Read production and shipping terms separately
 
-The planned customer policy is dispatch within two business days after confirmed card authorization for new ordinary in-stock offers, with charge captured only at shipment. Stripe activation and that integration are pending. The current evidence-only API still uses confirmed payment as its dispatch basis; the legacy schema below documents those existing records and is not the authorization-based flow. Business days are Monday–Friday in America/Chicago; carrier-holiday exceptions must be disclosed in the exact offer. Read the returned `production_terms` and dated commitments rather than starting the clock at request creation, offer acceptance, invoice creation or an unverified payment claim. Stock sourcing and compatibility review must be complete before this schedule is offered. The two-business-day window is for production and dispatch, not arrival at the customer.
+New version3 ordinary in-stock offers dispatch within two business days after the first verified full card authorization, with capture only after actual physical carrier handoff. The integration is implemented; runtime checkout remains disabled pending tax registration/account readiness. Historical version1/2 offers retain their paid-first terms. Business days are Monday–Friday in America/Chicago; carrier-holiday exceptions must be disclosed in the exact offer. Read the returned `production_terms` and dated commitments rather than starting the clock at request creation, offer acceptance, invoice creation or an unverified payment claim. Stock sourcing and compatibility review must be complete before this schedule is offered. The two-business-day window is for production and dispatch, not arrival at the customer.
 
-The current evidence-only version 2 offer schema binds these terms. Do not change the clock string or treat a hold as confirmed payment to make it fit the planned policy; the payment integration must version the contract first:
+New version3 offers bind these production terms version2 plus immutable authorization and tax evidence:
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "order_class": "ordinary_in_stock",
   "dispatch_within_business_days": 2,
-  "clock_starts": "first_confirmed_payment_observation",
+  "clock_starts": "first_verified_full_authorization_observation",
   "timezone": "America/Chicago",
   "calendar": "monday_friday",
   "holiday_policy": "carrier_closures_disclosed_in_offer"
@@ -100,7 +100,7 @@ New multicolor offers expose it separately as `price.handling_minor`; a single-c
 | Read exact offer and facts | `get_order_fulfillment` with `order_id` | `GET /api/v1/orders/{id}/fulfillment` |
 | Record exact customer acceptance | `accept_order_offer` | `POST /api/v1/orders/{id}/accept-offer` |
 
-The REST read returns `{fulfillment, backlog_status, history, ...}`. MCP places that object in `structuredContent.data`; check `isError`, `ok` and business errors first. Inspect the **full** `fulfillment.specification`, CAD/spec/color-plan fingerprints, exact material allocations, reviewed color map, quantity/destination, production and shipping terms, manufacturing + handling + shipping + tax total in USD cents, expiry and any arrival terms. New offers remain version 2; historical records remain readable/replayable and are never silently upgraded. Missing arrival dates are not delivery promises. An absent, expired or inconsistent offer is a blocker.
+The REST read returns `{fulfillment, backlog_status, history, ...}`. MCP places that object in `structuredContent.data`; check `isError`, `ok` and business errors first. Inspect the **full** `fulfillment.specification`, CAD/spec/color-plan fingerprints, exact material allocations, reviewed color map, quantity/destination, production and shipping terms, manufacturing + handling + shipping + tax total in USD cents, expiry and any arrival terms. New offers use version3; historical records remain readable/replayable and are never silently upgraded. Missing arrival dates are not delivery promises. An absent, expired or inconsistent offer is a blocker.
 
 Only after the customer explicitly approves those exact terms, build the MCP arguments from the returned `fulfillment` object. This mapping is preparation, not permission to call the write:
 
@@ -121,7 +121,7 @@ For REST, omit `order_id` and `idempotency_key` from that JSON, add `type:"accep
 
 ## Track facts and reconcile uncertainty
 
-Acceptance records agreement and leaves payment/printing unexecuted. Automatic collection is disabled. Planned payment policy: after you approve the exact full-price offer, a secure link will authorize a card hold. We charge only when your part ships. A hold can reduce your available card balance and expires on the issuer/network deadline; an expired hold requires fresh authorization, never an early charge merely to preserve it. Stripe activation and this flow are pending; current request submission is free and returns no payment URL. An authorization is not a captured payment. Existing manual records are evidence-only and must not be used to imply that the planned card-hold/capture flow is active. An ordinary automatically captured invoice is not a substitute for authorization-only checkout. Read fulfillment for payment and production status, QC, shipment/tracking, delivery, refund or resolution facts. Operator evidence, payment references and private printer details are not included in the customer view. A payment record alone is not evidence that production started; shipment is not delivery.
+Acceptance records agreement and leaves payment/printing unexecuted. Automatic collection is disabled. Version3 payment policy: after you approve the exact full-price offer, a secure link will authorize a card hold. We charge only when your part ships. A hold can reduce your available card balance and expires on the issuer/network deadline; an expired hold requires fresh authorization, never an early charge merely to preserve it. The flow is implemented but runtime activation is pending; current request submission is free and returns no payment URL. An authorization is not a captured payment. Historical manual records retain their original meaning and must not be used to infer current payment readiness. An ordinary automatically captured invoice is not a substitute for authorization-only checkout. Read fulfillment for payment and production status, QC, shipment/tracking, delivery, refund or resolution facts. Operator evidence, payment references and private printer details are not included in the customer view. A payment record alone is not evidence that production started; shipment is not delivery.
 
 After an uncertain acceptance response, read this same order first. Retry only the identical body and key; never automatically create a replacement order or key. A conflict requires reconciliation. A replay can return the current, later fulfillment state, so read its actual status rather than assuming the original stage is still current.
 
@@ -133,9 +133,18 @@ Eligible nonbinding requests can use `cancel_order`; accepted or active work req
 
 Request any current Bambu Lab model filament and its offered colors by exact product. Accepted intake families are PLA, PETG, ABS, ASA, PC, TPU, PET, PA, PA6, PA12, PPA and PPS; PA12 is retained for general intake/advice, not a claim of a verified Bambu retail SKU. Specify the exact grade, product and color identifier; blends and reinforcement variants stay within their base family. This is nonbinding intake, not a claim of stocked or compatible capacity. Every offer requires exact compatibility, stock and sourcing review. Firm production offers currently support verified PLA/PETG only. Support-only filaments are not model-material choices. No universal finished-part dimensional tolerance is promised; specify critical dimensions and allowed deviations for a job-specific offer.
 
-Planned payment policy: after you approve the exact full-price offer, a secure link will authorize a card hold. We charge only when your part ships. A hold can reduce your available card balance and expires on the issuer/network deadline; an expired hold requires fresh authorization, never an early charge merely to preserve it. Stripe activation and this flow are pending; current request submission is free and returns no payment URL.
+Version3 payment policy: after you approve the exact full-price offer, a secure link will authorize a card hold. We charge only when your part ships. A hold can reduce your available card balance and expires on the issuer/network deadline; an expired hold requires fresh authorization, never an early charge merely to preserve it. The flow is implemented but runtime activation is pending; current request submission is free and returns no payment URL.
 
 - [Bambu material request guide](https://partsforagents.com/guides/bambu-filament-materials)
 - [Color and multicolor handoff](https://partsforagents.com/guides/colors-and-multicolor)
 - [Dimensional tolerances and fit](https://partsforagents.com/guides/dimensional-tolerances-and-fit)
 - [Payments and shipping](https://partsforagents.com/guides/payments-and-shipping)
+
+
+## Authorization link and shipment charge
+
+For an accepted version3 offer, use owned REST `GET /api/v1/orders/{id}/payment-link` to read runtime readiness and any existing operation. Only if enabled, `POST` the same URL with `expected_revision` and `offer_fingerprint` from authoritative fulfillment, plus a saved `Idempotency-Key`. This returns `{payment:...}`; follow only the returned hosted Checkout URL. Preserve exact body/key before sending. A timeout requires GET reconciliation before replay, never a new key to bypass an uncertain operation. The MCP tool set is unchanged; REST handles this step. API access does not authorize entering a card or making a financial commitment on behalf of a user.
+
+Checkout authorizes the full reviewed USD total; a hold can reduce the cardholder’s available balance but is not collected revenue. Production requires a fresh, sufficient authorization and exact CAD/specification/customer/tax readback. Actual issuer/network expiry is authoritative; a cancelled or expired authorization may require a new customer-approved link after the old attempt is reconciled. Never capture early to keep a hold alive. The dispatch clock remains tied to the first verified authorization.
+
+Only the private operator can record actual physical carrier handoff after inspection, then request capture of the exact shipment charge. A shipping label is not physical handoff. Payment and shipment outcomes must be reconciled before retries. The invoice uses the same Checkout payment; there is no second invoice-collection charge. No payment endpoint transmits a print. If readiness is disabled, submit the nonbinding request and wait for the reviewed offer; do not substitute a direct immediate-charge invoice.
