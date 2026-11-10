@@ -76,7 +76,7 @@ New version3 offers bind these production terms version2 plus immutable authoriz
 }
 ```
 
-For that current schema, the clock starts from the recorded confirmed payment's `observed_at`. The production clock reports `absolute_dispatch_deadline:null`; it does not calculate a calendar due date automatically. Preserve any explicitly supported dates in the offer rather than deriving a guaranteed delivery date from the relative policy.
+For new version3 offers with production terms version2, `production_clock.first_authorized_at` records the first verified full card authorization; an uncaptured hold is not collected payment. `production_clock.absolute_dispatch_deadline` is the explicit reviewed `offer.dispatch_by`, with `deadline_status:"explicit_reviewed_offer"`. Read those returned values rather than deriving a different deadline or resetting the clock on a later authorization. Historical version1/2 offers with production terms version1 retain the confirmed-payment clock and `absolute_dispatch_deadline:null` (`deadline_status:"relative_terms_only"`); do not rewrite their terms as authorization-based offers.
 
 Origin is ZIP 60611; initial coverage is the contiguous US and DC. Supply recipient, street, city, two-letter state and ZIP. Alaska, Hawaii, territories and military destinations are outside this policy.
 
