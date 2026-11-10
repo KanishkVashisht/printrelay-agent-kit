@@ -63,6 +63,8 @@ The client `order --json-file PRIVATE_FILE --idempotency-key SAVED_UNIQUE_KEY` t
 }
 ```
 
+Only if the customer requests the launch offer, append `VIBE25; CAD tool/agent: ACTUAL_TOOL_OR_AGENT` to `review_notes`, replacing the placeholder with the actual tool or agent used. Preserve every approved functional requirement and question; do not overwrite them or apply the code automatically. For the first five eligible agent-generated CAD orders requested by November 15, 2026, the offer is up to 25% off manufacturing. The operator confirms the discount in the exact reviewed offer while preserving the verified job cost floor. Shipping, tax and multicolor handling are excluded; it cannot be combined with another offer. This is not an automatic coupon or capacity reservation. Submission remains free; payment links follow only when job review and payment readiness permit.
+
 Optional fields are `estimate_fingerprint`, paired `quote_id`/`quote_fingerprint`, and `max_total_minor` (integer USD cents, a preference only). Use actual returned evidence; do not fabricate fingerprints or quotes. REST sends idempotency in the header, so omit `idempotency_key` from the JSON file. MCP takes it as a tool argument.
 
 For free specialist advice, use `order_type:"dfm_review"` and a concrete question instead. Manufacturing/quotation requests return `payment_required_on_submission:false`, `payment_link:null`, and `payment_link_status:"after_review_if_accepted"`. Free DFM reports `not_required`; cancellation reports `not_applicable`. A null link is not a checkout URL. Payment-account setup and operator review remain required; do not promise timing or automatic link notifications.
