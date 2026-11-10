@@ -13,7 +13,7 @@
 - **Track the exact offer and fulfillment.** Inspect the complete price and specification, obtain customer approval, then track recorded payment, production, shipment and delivery facts through MCP or REST.
 - **Not charged unless the part ships.** The implemented version3 payment link authorizes a card hold after exact-offer acceptance; capture is restricted to verified physical carrier handoff. Holds can reduce available balance and expire. Runtime checkout remains disabled pending tax registration and account readiness. No endpoint transmits a print. There is no promised review or payment-link turnaround.
 
-Start with the [first-run walkthrough](examples/quickstart.md), then follow the [FDM offer and tracking workflow](examples/manual-fdm.md). Free planning estimates disclose uncalibrated assumptions and missing costs; they are not firm prices or delivery promises.
+**Already have a CAD file for a PLA/PETG part?** [Connect and submit your actual CAD](https://partsforagents.com/guides/cad-to-print#connect) for nonbinding review; no payment is needed at submission. The [first-run sample walkthrough](examples/quickstart.md) is optional. For reviewed offers and fulfillment, follow the [FDM offer and tracking workflow](examples/manual-fdm.md). Free planning estimates disclose uncalibrated assumptions and missing costs; they are not firm prices or delivery promises.
 
 ## Install the skill
 
