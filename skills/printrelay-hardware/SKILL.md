@@ -1,11 +1,11 @@
 ---
 name: printrelay-hardware
-description: Help CAD agents turn a model into a real part with free manufacturing advice, exact-CAD DFM review, FDM job submission and order tracking. Use for Bambu material/color requests, fit questions, eligible PLA/PETG printing, multicolor 3MF handoffs, reviewed pricing or product feedback. Submit a nonbinding job now; payment instructions follow the reviewed accepted offer.
+description: Help CAD agents turn a model into a real part with free manufacturing advice, exact-CAD DFM review, FDM job submission, SLA resin quotation requests and order tracking. Use for Bambu material/color requests, fit questions, eligible PLA/PETG printing, multicolor 3MF handoffs, reviewed pricing or product feedback. Submit a nonbinding job now; payment instructions follow the reviewed accepted offer.
 ---
 
 # partsforagents: from vibe CAD to a real part
 
-partsforagents 0.10 provides free manufacturing knowledge, specialist-agent DFM requests and nonbinding FDM job submission across the Bambu model-material catalog; firm offers currently require verified PLA/PETG eligibility. Submit a job now; payment instructions come later after review and exact-offer acceptance. Payment-account setup is pending and no automatic payment-link delivery is implemented. Read current readiness at `https://partsforagents.com/api/capabilities`. Initial intake/backlog creation is not a completed specialist review or accepted manufacturing offer. Fulfillment status and facts, not the backlog status alone, establish later progress. No tool moves money or transmits a print.
+partsforagents 0.10 provides free manufacturing knowledge, specialist-agent DFM requests and nonbinding FDM job submission across the Bambu model-material catalog, plus SLA resin quotation requests. Firm manufacturing offers currently require verified PLA/PETG eligibility; SLA intake is quote review only. Submit a job now; payment instructions come later after review and exact-offer acceptance. Payment-account setup is pending and no automatic payment-link delivery is implemented. Read current readiness at `https://partsforagents.com/api/capabilities`. Initial intake/backlog creation is not a completed specialist review or accepted manufacturing offer. Fulfillment status and facts, not the backlog status alone, establish later progress. No tool moves money or transmits a print.
 
 Use the connected partsforagents MCP tools when available. Otherwise use the bundled standard-library Python client, with `PRINTRELAY_API_KEY` stored in the environment. The owner can authorize native digest registration below, or create a one-time key in the signed-in [human workspace](https://partsforagents.com/for-humans#workspace). The [agent home](https://partsforagents.com/) provides connection and workflow entry points; [For humans](https://partsforagents.com/for-humans) hosts the browser console. Use the key for REST and external MCP at `https://partsforagents.com/api/mcp`. Native `https://printrelay.kva1.chatgpt.site/mcp` uses Sites OAuth via the Site-created plugin; a partsforagents key is not an OAuth token. Never set `oai-authenticated-*` headers. API documentation: `https://partsforagents.com/docs`; contract: `/openapi.json`.
 
@@ -33,9 +33,13 @@ Use native `list_agent_keys` and `revoke_agent_key` with an exact owned key ID. 
 
 Set only `PRINTRELAY_API_KEY_FILE` to the private file path for the bundled client, or configure `PRINTRELAY_API_KEY` directly in the runtime’s secret store. The bootstrap helper must be beside the client for file-based loading. Public commands need neither. Test a newly registered key with read-only `list`, then revoke unused credentials. Browser key generation still exists but is not idempotent; if its response is lost, inspect/revoke the unusable key before retrying. If the native tool catalog is stale, refresh the connection or start a new chat; do not forge identity headers as a workaround.
 
+## Discover a project and read its complete guide
+
+Fetch [the project catalog](https://partsforagents.com/vibe-cad/catalog.json), choose an appropriate project, then follow its `markdown_url` or `json_url`. Each `/vibe-cad/{slug}/guide.md` and `/vibe-cad/{slug}/guide.json` contains the full measurements, CAD prompt, modeling steps, checks and exact-file submission instructions; no account or JavaScript is needed. Use returned URLs, not invented slugs. The library's concept images and recipes are not validated or downloadable production CAD. Create and inspect the customer's actual model before upload. The guide's `order_url` opens the human workspace with project context; it does not create an order or identify a CAD revision. Include the guide URL in review notes while preserving the user's requirements.
+
 ## Preserve the part the user intends
 
-Before submitting, establish the source model, explicit mm/inch units, quantity, process, material family and exact grade/acceptable substitute policy, finish, color, manufacturing settings, destination and arrival requirement. Preserve functional/tolerance notes. Do not silently substitute material, convert/scale the model, drop notes or reinterpret production lead time as arrival time. The user can explicitly choose supplier-standard manufacturing settings; do not assume that choice.
+Before submitting, establish the source model, explicit mm/inch units, quantity, process, material family and exact grade/acceptable substitute policy, finish, color, manufacturing settings, destination and arrival requirement. For an SLA resin recommendation, the grade may remain explicitly unresolved as described below; this is not approval of an arbitrary resin. Preserve functional/tolerance notes. Do not silently substitute material, convert/scale the model, drop notes or reinterpret production lead time as arrival time. The user can explicitly choose supplier-standard manufacturing settings; do not assume that choice.
 
 Ask only for missing details that affect manufacture or purchase. Generate or refine CAD when requested, and inspect scale/geometry with available CAD tools. File-format acceptance alone does not prove manufacturability. Use a noncritical prototype for the first fit check.
 
@@ -49,7 +53,7 @@ Use `get_manufacturing_advice` or `python3 scripts/printrelay.py advice --topic 
 2. Inspect `get_cad_preflight` or client `preflight`. Read existing versions with `get_manufacturing_specifications` or `specifications`, then pin a complete specification. Keep its fingerprint with every downstream operation.
 3. Use `analyze_manufacturability` / client `analyze REQUEST_ID --fingerprint SPEC_HASH` for free rule-based observations bound to the stored CAD hash and specification. It does not measure wall thickness, predict strength/supports, certify printability or constitute a specialist AI review.
 4. Use `estimate_print_options` / client `estimate REQUEST_ID --fingerprint SPEC_HASH` for a free planning preview. The current model uses explicit, uncalibrated internal FDM PLA/PETG assumptions; unsupported inputs return unavailable. This is not a supplier quote, landed price, fee offer or delivery promise. Do not present a range without its assumptions and missing costs.
-5. When the user wants a job or review submitted, call `place_order` with the exact request/spec, `order_type` and `acknowledge_nonbinding:true`. Use `dfm_review` for free asynchronous specialist advice; `quotation` or `manufacturing` records nonbinding interest in owner-fulfilled FDM; the operator must separately issue an exact offer for customer approval. Save the returned order ID and actual status. A queued specialist request is not a completed report and has no promised turnaround.
+5. When the user wants a job or review submitted, call `place_order` with the exact request/spec, `order_type` and `acknowledge_nonbinding:true`. Use `dfm_review` for free asynchronous specialist advice. For FDM, `quotation` or `manufacturing` records nonbinding interest; for SLA with RESIN, use `quotation` only. The operator must separately obtain exact supplier evidence or issue an eligible firm offer for customer approval. Save the returned order ID and actual status. A queued specialist request is not a completed report and has no promised turnaround.
 
 The client `order --json-file PRIVATE_FILE --idempotency-key SAVED_UNIQUE_KEY` takes a JSON object like this, replacing the placeholders with returned identities:
 
@@ -71,6 +75,17 @@ For free specialist advice, use `order_type:"dfm_review"` and a concrete questio
 
 Read `list_orders` / client `orders`, then `get_order` / `order-status ORDER_ID` for the saved review and outstanding requirements. `cancel_order` / `cancel-order ORDER_ID` cancels eligible nonbinding backlog requests; accepted or active work requires fulfillment resolution. It never cancels a supplier order or printer job. No backlog action charges money, reserves capacity, submits to suppliers or authorizes production.
 
+## Request an SLA resin quote
+
+Use MCP, REST or the bundled Python client for SLA intake (`upload --material RESIN`, then `specification REQUEST_ID --json-file PRIVATE_SPEC`, then `order --json-file PRIVATE_INTENT --idempotency-key SAVED_KEY`). Read [SLA quotation scope](https://partsforagents.com/sla-3d-printing) and current production capabilities first.
+
+1. Upload the authorized exact CAD with `material:"RESIN"`, declared units and quantity. Keep the returned request ID and file hash.
+2. Call `set_manufacturing_specification` with `process:"SLA"`. Set `material_grade` to the customer's exact requested resin grade, or omit it/use `null` if the customer wants a resin recommendation. Finish and color still require explicit choices; supplier-standard settings need customer agreement. Preserve the arrival requirement, destination and functional notes.
+3. Submit `place_order` with `order_type:"quotation"`, the returned specification fingerprint, `acknowledge_nonbinding:true` and a saved idempotency key. Describe the intended use and resin question in `review_notes`. SLA manufacturing requests and crossed FDM/RESIN or SLA/filament pairs are rejected.
+4. Read the saved order and review. A null grade remains unresolved: `complete_for_order:false`; it cannot support a comparable exact-material supplier quote. Once the customer approves a specific grade or revised choices, pin a new specification and use its new fingerprint. Reconcile or cancel the earlier intent before deliberately submitting a new one; never rewrite the old record or silently choose a substitute.
+
+SLA quote sourcing is planned through the Form Now buyer website. The current backlog does not upload CAD to Form Now, fetch a supplier quote, reserve capacity or enable an SLA firm offer. Prices, materials, finishing and delivery need exact-job review. Supplier sharing requires separate named-provider authorization. The FDM budget-preview model does not estimate SLA; do not apply filament costs or FDM dispatch/shipping terms to resin. Submit now without payment; a reviewed price and payment link follow only when the exact job is accepted and payment readiness permits.
+
 ## Send non-sensitive product feedback
 
 Use public MCP `submit_agent_feedback` or REST `POST /api/feedback`; no account or API key is needed. The Python helper is `feedback --json-file PRIVATE_FILE --idempotency-key SAVED_KEY`. Required JSON: `category` (`bug`, `docs`, `feature`, `ordering`, `pricing`, `other`), `message` (1–4000 characters) and `consent:true`. Optional `agent_name` (1–80) and `context_path` (1–240) must be omitted if empty. Context is a same-site pathname such as `/docs`: no external URL, query, fragment, dot segment or private ID. MCP additionally takes `idempotency_key`; REST takes the key in the header.
@@ -81,7 +96,7 @@ Save the exact body and key first (8–100 letters, digits, `.`, `_`, `:` or `-`
 
 ## Deferred supplier comparison
 
-Federated suppliers are deferred; the current manufacturing path is owner-operated FDM. Do not queue comparison merely to complete an owner-FDM order. If supplier collection is later explicitly enabled:
+Automatic supplier comparison remains deferred. Firm fulfillment currently uses owner-operated FDM; SLA quotation requests await manual Form Now review. `request_provider_comparison` does not list Form Now: submit an SLA quotation intent instead of inventing a provider identifier or a supplier API. Do not queue comparison merely to complete an owner-FDM order. If supplier collection is later explicitly enabled:
 
 1. Request comparison only after the user authorizes uploading this design to the named providers. partsforagents uses persistent ordinary buyer accounts at suppliers; it does not use guest checkout or depend on reseller onboarding. A queued job is not a quote. Report account/login/browser blockers as such.
 2. Read quote results. Compare only the same specification and currency with complete shipping/tax amounts, provider-review state and delivery evidence. Do not rank a preliminary part price as a landed offer. Expired, incomplete or mismatched offers stay unorderable.
@@ -141,6 +156,8 @@ Request any current Bambu Lab model filament and its offered colors by exact pro
 
 Version3 payment policy: after you approve the exact full-price offer, a secure link will authorize a card hold. We charge only when your part ships. A hold can reduce your available card balance and expires on the issuer/network deadline; an expired hold requires fresh authorization, never an early charge merely to preserve it. The flow is implemented; production activation remains pending. current request submission is free and returns no payment URL.
 
+- [SLA resin quotation requests](https://partsforagents.com/sla-3d-printing)
+- [Vibe CAD project catalog](https://partsforagents.com/vibe-cad/catalog.json)
 - [Bambu material request guide](https://partsforagents.com/guides/bambu-filament-materials)
 - [Color and multicolor handoff](https://partsforagents.com/guides/colors-and-multicolor)
 - [Dimensional tolerances and fit](https://partsforagents.com/guides/dimensional-tolerances-and-fit)

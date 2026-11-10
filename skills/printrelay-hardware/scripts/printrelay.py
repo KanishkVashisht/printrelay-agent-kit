@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""partsforagents: advice, FDM job requests, tracking and feedback. No payment or print commands."""
+"""partsforagents: advice, FDM jobs, SLA quote requests, tracking and feedback. No payment or print commands."""
 import argparse, hashlib, json, os, re, sys, urllib.request, urllib.error, urllib.parse, uuid
 from pathlib import Path
 BASE='https://partsforagents.com'
+REQUESTABLE_MATERIAL_FAMILIES=('PLA','PETG','ABS','ASA','PC','TPU','PET','PA','PA6','PA12','PPA','PPS','RESIN')
 class NoRedirect(urllib.request.HTTPRedirectHandler):
  def redirect_request(self, req, fp, code, msg, headers, newurl):
   raise RuntimeError('Unexpected API redirect; credential not forwarded.')
@@ -82,7 +83,7 @@ def main(argv=None):
  p=sub.add_parser('order',help='Submit a NONBINDING job/review request now; an accepted offer and payment instructions follow review.')
  p.add_argument('--json-file',required=True,help='Exact request/spec, order_type and acknowledge_nonbinding:true; see SKILL.md.')
  p.add_argument('--idempotency-key',required=True,type=idempotency_key,help='Save and reuse with identical JSON after uncertainty.')
- p=sub.add_parser('upload');p.add_argument('file');p.add_argument('--email',required=True);p.add_argument('--material',choices=['PLA','PETG','PA12'],required=True);p.add_argument('--quantity',type=int,required=True);p.add_argument('--units',choices=['mm','inch'],required=True);p.add_argument('--country',required=True);p.add_argument('--postal-code',required=True);p.add_argument('--speed',choices=['standard','fastest'],default='standard');p.add_argument('--notes',default='');p.add_argument('--idempotency-key',required=True,type=idempotency_key);p.add_argument('--consent',action='store_true',required=True,help='Confirm the owner authorized intake upload.')
+ p=sub.add_parser('upload');p.add_argument('file');p.add_argument('--email',required=True);p.add_argument('--material',choices=REQUESTABLE_MATERIAL_FAMILIES,required=True,help='RESIN for SLA quotation requests; other families for FDM review. Availability requires exact-job review.');p.add_argument('--quantity',type=int,required=True);p.add_argument('--units',choices=['mm','inch'],required=True);p.add_argument('--country',required=True);p.add_argument('--postal-code',required=True);p.add_argument('--speed',choices=['standard','fastest'],default='standard');p.add_argument('--notes',default='');p.add_argument('--idempotency-key',required=True,type=idempotency_key);p.add_argument('--consent',action='store_true',required=True,help='Confirm the owner authorized intake upload.')
  p=sub.add_parser('specification');p.add_argument('request_id',type=request_id);p.add_argument('--json-file',required=True)
  p=sub.add_parser('compare');p.add_argument('request_id',type=request_id);p.add_argument('--fingerprint',required=True,type=fingerprint);p.add_argument('--providers',nargs='+',choices=['craftcloud','treatstock','xometry','jlc3dp','pcbway'],required=True);p.add_argument('--allow-provider-upload',action='store_true',required=True,help='Confirm owner authorized CAD upload to each named provider.')
  args=parser.parse_args(argv)

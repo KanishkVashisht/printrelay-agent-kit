@@ -120,4 +120,33 @@ class FeedbackClientTests(unittest.TestCase):
         with self.assertRaisesRegex(RuntimeError, 'credential not forwarded'):
             client.NoRedirect().redirect_request(None, None, 307, 'redirect', {}, 'https://other.test')
 
+class MaterialIntakeClientTests(unittest.TestCase):
+    def test_current_material_families_reach_upload_unchanged_without_network(self):
+        families = ('PLA', 'PETG', 'ABS', 'ASA', 'PC', 'TPU', 'PET', 'PA', 'PA6', 'PA12', 'PPA', 'PPS', 'RESIN')
+        with tempfile.TemporaryDirectory() as temp:
+            cad = Path(temp) / 'fixture.stl'
+            cad.write_bytes(b'solid local_test\nendsolid local_test\n')
+            digest = client.hashlib.sha256(cad.read_bytes()).hexdigest()
+            for family in families:
+                with self.subTest(material=family), patch.object(client, 'call', return_value={'file_sha256': digest}) as call, contextlib.redirect_stdout(io.StringIO()):
+                    client.main(['upload', str(cad), '--email', 'qa@example.test', '--material', family, '--quantity', '1', '--units', 'mm', '--country', 'US', '--postal-code', '60601', '--idempotency-key', 'local-material-key', '--consent'])
+                    self.assertEqual(call.call_args.args[:2], ('/api/v1/requests', 'POST'))
+                    self.assertIn(('name="material"\r\n\r\n' + family + '\r\n').encode(), call.call_args.args[2])
+                    self.assertEqual(call.call_args.args[4], 'local-material-key')
+            for family in ('PVA', 'STEEL', 'resin'):
+                with self.subTest(rejected_material=family), patch.object(client, 'call') as call, contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit):
+                    client.main(['upload', str(cad), '--email', 'qa@example.test', '--material', family, '--quantity', '1', '--units', 'mm', '--country', 'US', '--postal-code', '60601', '--idempotency-key', 'local-material-key', '--consent'])
+                call.assert_not_called()
+
+    def test_sla_null_grade_survives_private_specification_input(self):
+        body = {'process': 'SLA', 'material_grade': None, 'finish': 'Supplier standard, customer approved', 'color': 'Supplier standard, customer approved', 'manufacturing_options': {'policy': 'provider_standard'}, 'required_arrival_at': None}
+        request_id = 'req_12345678-1234-1234-1234-123456789abc'
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / 'spec.json'
+            path.write_text(json.dumps(body))
+            with patch.object(client, 'call', return_value={}) as call, contextlib.redirect_stdout(io.StringIO()):
+                client.main(['specification', request_id, '--json-file', str(path)])
+            self.assertEqual(call.call_args.args[:2], ('/api/v1/requests/' + request_id + '/specification', 'PUT'))
+            self.assertEqual(json.loads(call.call_args.args[2]), body)
+
 if __name__ == '__main__': unittest.main()
